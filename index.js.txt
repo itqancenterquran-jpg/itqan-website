@@ -1569,6 +1569,426 @@ body.has-pay-bar .layout { min-height: calc(100vh - 85px - 118px); }
 .pr-unpaid { background: #fff3e6; color: #b35b00; }
 .pr-done { color: var(--success); font-weight: bold; }
 
+/* =========================================================
+   المحادثات 
+========================================================= */
+
+/* ---- زر الإشعارات العائم (أعلى الشمال) ---- */
+.ch-bell {
+  position: fixed;
+  top: 14px;
+  left: 18px;
+  z-index: 2600;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  cursor: pointer;
+  color: #fff;
+  background: linear-gradient(135deg, #007c85, #005c6c);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .22);
+  border: 2px solid #d6ae55;
+  transition: transform .18s;
+  user-select: none;
+}
+.ch-bell:hover { transform: scale(1.08); }
+.ch-bell.ch-ring { animation: chRing 1.2s ease 2; }
+.ch-bell-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 10px;
+  background: #e53935;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 20px;
+  text-align: center;
+  display: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .3);
+}
+@keyframes chRing {
+  0%, 100% { transform: rotate(0); }
+  15% { transform: rotate(14deg); }
+  30% { transform: rotate(-12deg); }
+  45% { transform: rotate(9deg); }
+  60% { transform: rotate(-6deg); }
+}
+
+/* ---- التنبيه المنبثق ---- */
+.ch-toast {
+  position: fixed;
+  top: 70px;
+  left: 18px;
+  z-index: 2600;
+  width: 290px;
+  max-width: calc(100vw - 36px);
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: none;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .22);
+  border-right: 4px solid #007c85;
+  animation: chSlide .3s ease;
+}
+.ch-toast.show { display: flex; }
+.ch-toast-ico { font-size: 24px; }
+.ch-toast-body { min-width: 0; flex: 1; }
+.ch-toast-title { font-weight: 700; font-size: 14px; color: #222; }
+.ch-toast-text {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+@keyframes chSlide {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- شارة القائمة الجانبية ---- */
+.ch-menu-badge {
+  margin-right: auto;
+  background: #e53935;
+  color: #fff;
+  border-radius: 10px;
+  padding: 0 7px;
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  display: none;
+}
+
+/* ---- الصفحة ---- */
+.ch-notice {
+  background: #fff8e6;
+  border: 1px solid #f1dca4;
+  color: #7a5b10;
+  padding: 9px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  margin-bottom: 12px;
+}
+
+.ch-app {
+  display: flex;
+  height: calc(100vh - 210px);
+  min-height: 460px;
+  background: #fff;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .10);
+  border: 1px solid #e8ecee;
+}
+
+/* ---- القائمة الجانبية ---- */
+.ch-side {
+  width: 330px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid #e8ecee;
+  background: #fbfcfc;
+}
+.ch-side-head {
+  padding: 14px;
+  background: linear-gradient(135deg, #007c85, #005c6c);
+  color: #fff;
+}
+.ch-me {
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ch-search {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  outline: none;
+  border-radius: 22px;
+  padding: 9px 14px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, .95);
+  font-family: inherit;
+}
+.ch-tabs { display: flex; gap: 6px; margin-top: 10px; }
+.ch-tab {
+  flex: 1;
+  text-align: center;
+  padding: 6px 0;
+  border-radius: 16px;
+  font-size: 13px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, .15);
+  color: #fff;
+}
+.ch-tab.active { background: #d6ae55; color: #3b2d05; font-weight: 700; }
+
+.ch-list { flex: 1; overflow-y: auto; }
+.ch-item {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  padding: 11px 14px;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f2f3;
+  transition: background .15s;
+}
+.ch-item:hover { background: #f1f7f7; }
+.ch-item.active { background: #e3f1f2; }
+
+.ch-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-weight: 700;
+  font-size: 18px;
+}
+.ch-av-admin   { background: linear-gradient(135deg, #d6ae55, #b88a26); }
+.ch-av-teacher { background: linear-gradient(135deg, #00959f, #00606c); }
+.ch-av-student { background: linear-gradient(135deg, #5c7cfa, #3b57c9); }
+
+.ch-item-body { flex: 1; min-width: 0; }
+.ch-item-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.ch-item-name {
+  font-weight: 700;
+  font-size: 14.5px;
+  color: #1e2a2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ch-item-time { font-size: 11.5px; color: #8a979c; flex-shrink: 0; }
+.ch-item-bottom { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 3px; }
+.ch-item-last {
+  font-size: 13px;
+  color: #7b898e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ch-unread {
+  background: #00959f;
+  color: #fff;
+  border-radius: 10px;
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
+  padding: 0 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  text-align: center;
+  flex-shrink: 0;
+}
+.ch-role-chip {
+  font-size: 10.5px;
+  padding: 1px 7px;
+  border-radius: 9px;
+  background: #eef2f3;
+  color: #68777c;
+  margin-right: 6px;
+  font-weight: 600;
+}
+.ch-noresult { padding: 30px 16px; text-align: center; color: #98a4a8; font-size: 14px; }
+
+/* ---- المحادثة ---- */
+.ch-main { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #f4f7f7; }
+
+.ch-empty {
+  margin: auto;
+  text-align: center;
+  color: #8a979c;
+  padding: 20px;
+}
+.ch-empty .ch-empty-ico { font-size: 62px; margin-bottom: 8px; }
+.ch-empty h3 { margin: 0 0 6px; color: #3a4a4f; }
+
+.ch-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  background: #fff;
+  border-bottom: 1px solid #e8ecee;
+}
+.ch-back {
+  display: none;
+  border: none;
+  background: #eef2f3;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+}
+.ch-head-name { font-weight: 700; font-size: 16px; color: #1e2a2e; }
+.ch-head-sub { font-size: 12px; color: #8a979c; }
+
+.ch-msgs {
+  flex: 1;
+  overflow-y: auto;
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background-color: #eef3f3;
+  background-image: radial-gradient(rgba(0, 124, 133, .06) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+.ch-day { text-align: center; margin: 10px 0; }
+.ch-day span {
+  background: #fff;
+  color: #6b7b80;
+  font-size: 12px;
+  padding: 4px 14px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .08);
+}
+.ch-nomsg { margin: auto; color: #8a979c; font-size: 14px; background: #fff; padding: 10px 18px; border-radius: 14px; }
+
+/* رسالتي على اليمين - رسالة الطرف الآخر على اليسار (بدّل flex-start/flex-end لو عايز العكس) */
+.ch-row { display: flex; }
+.ch-mine   { justify-content: flex-start; }
+.ch-theirs { justify-content: flex-end; }
+
+.ch-bubble {
+  max-width: 72%;
+  padding: 8px 12px 6px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .10);
+  animation: chPop .18s ease;
+}
+.ch-mine .ch-bubble {
+  background: linear-gradient(135deg, #00959f, #007c85);
+  color: #fff;
+  border-radius: 16px 16px 4px 16px;
+}
+.ch-theirs .ch-bubble {
+  background: #fff;
+  color: #1e2a2e;
+  border-radius: 16px 16px 16px 4px;
+}
+.ch-meta {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 10.5px;
+  margin-top: 2px;
+  opacity: .75;
+}
+.ch-tick.ch-read { color: #bff3ff; opacity: 1; }
+.ch-pending { opacity: .6; }
+.ch-failed { background: #e57373 !important; }
+
+@keyframes chPop {
+  from { opacity: 0; transform: scale(.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ---- شريط الكتابة ---- */
+.ch-composer {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #fff;
+  border-top: 1px solid #e8ecee;
+}
+.ch-input {
+  flex: 1;
+  resize: none;
+  border: 1px solid #dfe5e7;
+  border-radius: 22px;
+  padding: 10px 16px;
+  font-size: 14.5px;
+  font-family: inherit;
+  line-height: 1.6;
+  max-height: 120px;
+  outline: none;
+  background: #f7f9f9;
+}
+.ch-input:focus { border-color: #00959f; background: #fff; }
+.ch-btn-round {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  font-size: 20px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ch-btn-emoji { background: #f1f4f5; }
+.ch-btn-emoji:hover { background: #e4eaec; }
+.ch-btn-send { background: linear-gradient(135deg, #00959f, #007c85); color: #fff; }
+.ch-btn-send:hover { filter: brightness(1.1); }
+
+.ch-emoji-panel {
+  position: absolute;
+  bottom: 64px;
+  right: 14px;
+  width: 292px;
+  max-width: calc(100% - 28px);
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+  padding: 10px;
+  display: none;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 2px;
+  z-index: 5;
+}
+.ch-emoji-panel.show { display: grid; }
+.ch-emoji-panel span {
+  font-size: 21px;
+  text-align: center;
+  padding: 4px 0;
+  cursor: pointer;
+  border-radius: 8px;
+}
+.ch-emoji-panel span:hover { background: #eef5f5; }
+
+/* ---- موبايل ---- */
+@media (max-width: 768px) {
+  .ch-app { height: calc(100vh - 170px); border-radius: 12px; }
+  .ch-side { width: 100%; border-left: none; }
+  .ch-main { display: none; }
+  .ch-app.ch-open .ch-side { display: none; }
+  .ch-app.ch-open .ch-main { display: flex; }
+  .ch-back { display: block; }
+  .ch-bubble { max-width: 86%; }
+  .ch-msgs { padding: 12px; }
+}
+
 </style>
 
 
@@ -2369,6 +2789,62 @@ textarea:focus-visible {
 }
 </style>
 
+
+<style id="itqan-professional-theme">
+:root{
+  --itqan-primary:#007c85;--itqan-primary-dark:#004a5d;--itqan-primary-soft:#eaf7f7;
+  --itqan-gold:#d6ae55;--itqan-bg:#f4f7f7;--itqan-surface:#fff;
+  --itqan-text:#17252b;--itqan-muted:#6b7b82;--itqan-border:#e3e9e8;
+  --itqan-shadow:0 10px 30px rgba(0,74,93,.07);--itqan-shadow-hover:0 16px 38px rgba(0,74,93,.12);
+  --itqan-radius:18px;
+}
+*{font-family:'IBM Plex Sans Arabic',Arial,Tahoma,sans-serif}
+body{background:radial-gradient(circle at 100% 0%,rgba(0,124,133,.055),transparent 30%),linear-gradient(180deg,#f7faf9,#f2f6f5);color:var(--itqan-text)}
+.header{min-height:78px;padding:14px 30px;display:flex;align-items:center;position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid rgba(227,233,232,.9);box-shadow:0 3px 20px rgba(0,74,93,.045);z-index:100}
+.brand{color:var(--itqan-primary-dark);font-size:21px;font-weight:800}.subtitle{color:var(--itqan-primary);margin-top:2px;font-size:12px;font-weight:600}
+.user-bar{left:30px;gap:10px}.user-bar #userBarName{background:var(--itqan-primary-soft);color:var(--itqan-primary-dark);border:1px solid #d8eeee;padding:8px 13px;border-radius:999px;font-weight:700}
+.layout{min-height:calc(100vh - 78px)}
+.sidebar{width:248px;flex:0 0 248px;padding:22px 14px;background:radial-gradient(circle at 20% 0%,rgba(255,255,255,.09),transparent 28%),linear-gradient(180deg,#004a5d,#003c4c);box-shadow:4px 0 26px rgba(0,50,65,.10);position:sticky;top:78px;height:calc(100vh - 78px);overflow:auto}
+.sidebar-title{padding:10px 12px 20px;margin:0 0 8px;font-size:20px;font-weight:800;color:#fff;border-bottom:1px solid rgba(255,255,255,.12)}
+.menu-item{min-height:48px;display:flex;align-items:center;gap:10px;padding:12px 14px;margin:4px 0;border:1px solid transparent;border-radius:13px;color:rgba(255,255,255,.82);font-weight:600;transition:transform .18s,background .18s,border-color .18s}
+.menu-item:hover{transform:translateX(-3px);color:#fff;background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.08)}
+.menu-item.active{color:#fff;background:linear-gradient(135deg,rgba(0,124,133,.75),rgba(0,92,108,.78));border-color:rgba(214,174,85,.34);box-shadow:0 8px 20px rgba(0,0,0,.10),inset 3px 0 0 var(--itqan-gold)}
+.main{padding:32px clamp(18px,3vw,38px);min-width:0;max-width:1700px}
+.page-title{display:flex;align-items:center;gap:10px;margin:0 0 22px;font-size:30px;line-height:1.2;font-weight:800;color:var(--itqan-primary-dark);letter-spacing:-.5px}
+.page-title::after{content:"";width:42px;height:4px;border-radius:99px;background:linear-gradient(90deg,var(--itqan-gold),var(--itqan-primary));margin-top:16px}
+.section{background:rgba(255,255,255,.94);padding:24px;border:1px solid rgba(227,233,232,.95);border-radius:var(--itqan-radius);box-shadow:var(--itqan-shadow);overflow:hidden}
+.section-header{margin-bottom:20px;padding-bottom:17px;border-bottom:1px solid #edf1f0}.section-header h2{color:var(--itqan-primary-dark);font-size:20px;font-weight:800}
+.cards{gap:16px}.card{position:relative;overflow:hidden;min-height:142px;padding:20px;border-radius:17px;border:1px solid var(--itqan-border);background:linear-gradient(145deg,#fff,#f9fbfa);box-shadow:var(--itqan-shadow);transition:transform .22s,box-shadow .22s,border-color .22s}
+.card::before{content:"";position:absolute;inset:0 0 auto;height:3px;background:linear-gradient(90deg,var(--itqan-primary),var(--itqan-gold))}
+.card:hover{transform:translateY(-4px);border-color:#cfe2e1;box-shadow:var(--itqan-shadow-hover)}
+.card-icon{width:46px;height:46px;display:grid;place-items:center;border-radius:14px;background:var(--itqan-primary-soft);color:var(--itqan-primary-dark);font-size:22px;box-shadow:inset 0 0 0 1px #d7eeee}
+.card-title{margin-top:14px;color:var(--itqan-muted);font-size:13px;font-weight:600}.card-number{margin-top:3px;color:var(--itqan-primary-dark);font-size:31px;line-height:1.1;font-weight:800}
+.btn{min-height:40px;padding:9px 15px;border-radius:11px;border:1px solid transparent;font-weight:700;transition:transform .18s,box-shadow .18s,background .18s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 8px 18px rgba(0,74,93,.10)}.btn:active{transform:none}.btn:disabled{opacity:.55;transform:none;box-shadow:none}
+.btn-primary{color:#fff;background:linear-gradient(135deg,var(--itqan-primary),var(--itqan-primary-dark));box-shadow:0 5px 14px rgba(0,124,133,.18)}.btn-secondary{color:var(--itqan-primary-dark);background:#fff;border-color:#d8e3e1}.btn-secondary:hover{background:var(--itqan-primary-soft);border-color:#bfdcdb}.btn-danger{background:#b54747;color:#fff}
+.search,.us-filter,.sch-bar select,.sch-bar input[type=date],#lessonDateFilter{min-height:42px;padding:10px 13px;border:1px solid #dbe5e3;border-radius:11px;background:#fff;box-shadow:0 2px 8px rgba(0,74,93,.025)}
+.search:focus,.us-filter:focus,.sch-bar select:focus,.sch-bar input[type=date]:focus,#lessonDateFilter:focus{border-color:#72b8ba;box-shadow:0 0 0 4px rgba(0,124,133,.10)}
+.table-container{overflow:auto;border:1px solid var(--itqan-border);border-radius:14px;box-shadow:0 3px 12px rgba(0,74,93,.035)}
+table{border-collapse:separate;border-spacing:0}th,td{padding:14px 13px;border-bottom:1px solid #edf1f0}th{position:sticky;top:0;z-index:2;background:#f5f9f8;color:var(--itqan-primary-dark);font-size:12px;font-weight:800;border-bottom:1px solid #dce7e5}tbody tr{background:#fff;transition:background .15s}tbody tr:hover{background:#f7fbfa}tbody tr:last-child td{border-bottom:0}td strong{color:#20363c}td small{color:var(--itqan-muted)}
+.lesson-status{display:inline-flex;align-items:center;min-height:28px;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:800;border:1px solid transparent}.status-default{background:#f1f4f3;color:#65757a}.status-running{background:#e5f7f2;color:#16704e;border-color:#c8eadc}.status-completed{background:#edf7f0;color:#237a57;border-color:#d1eadb}.status-waiting{background:#fff5df;color:#9a6a16;border-color:#f0dfb8}
+#lessonDateFilter{min-width:190px!important}#lessonsTable{content-visibility:auto;contain-intrinsic-size:520px}#lessonsTable .table-container{max-height:calc(100vh - 330px)}
+.loading{min-height:120px;display:grid;place-items:center;color:var(--itqan-muted);font-weight:600;position:relative}.loading::before{content:"";width:24px;height:24px;border:3px solid #d9e9e7;border-top-color:var(--itqan-primary);border-radius:50%;animation:itqanSpin .8s linear infinite}@keyframes itqanSpin{to{transform:rotate(360deg)}}
+.empty{padding:60px 24px;text-align:center;color:var(--itqan-muted);background:linear-gradient(180deg,#fbfdfc,#f7faf9);border:1px dashed #d6e2e0;border-radius:15px}.empty h3{color:var(--itqan-primary-dark);margin:12px 0 6px;font-size:18px}
+.form-grid{gap:16px}.form-group{gap:7px}.form-group label{color:#31515a;font-size:12px;font-weight:800}.form-group input,.form-group select,.form-group textarea{min-height:43px;padding:10px 12px;border:1px solid #d9e3e1;border-radius:11px;background:#fff}.form-group textarea{min-height:100px}.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:#70b4b7;box-shadow:0 0 0 4px rgba(0,124,133,.09)}
+.modal{background:rgba(0,42,53,.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}.modal .modal-content,.modal .modal-box{border:1px solid rgba(255,255,255,.65);border-radius:22px;box-shadow:0 28px 80px rgba(0,36,48,.22)}.modal-header{margin-bottom:20px;padding-bottom:16px}.modal-header h2{color:var(--itqan-primary-dark);font-weight:800}.close-btn{background:#f2f7f6;color:var(--itqan-primary-dark)}.close-btn:hover{background:var(--itqan-primary);color:#fff}
+.profile-item,.profile-stats>div{border-color:#e1e9e7;border-radius:14px;background:#fbfdfc}.profile-section{background:#f6faf9;border-color:#deebe9;border-radius:15px}.profile-stats strong{color:var(--itqan-primary-dark)}
+.sch-bar{padding:5px 0 16px;margin-bottom:0;gap:9px}.sch-bar .btn{min-height:38px}.sch-bar .sch-range{order:10;flex:1 1 260px;color:var(--itqan-primary-dark);font-size:16px;font-weight:800;text-align:center}.sch-meta{order:11;width:100%;margin-inline-start:0;padding:8px 11px;color:var(--itqan-muted);background:#f6faf9;border:1px solid #e4edeb;border-radius:10px;text-align:center}
+.sch-wrap{border:1px solid #dce8e6;border-radius:17px;background:#fff;box-shadow:0 5px 18px rgba(0,74,93,.05)}.sch-scroll{max-height:calc(100vh - 300px);min-height:480px}.sch-head{background:rgba(255,255,255,.96);border-bottom:1px solid #dce8e6;backdrop-filter:blur(10px)}.sch-corner,.sch-gutter{flex-basis:72px}.sch-dayhead{min-width:126px;padding:10px 6px;border-left:1px solid #edf2f1}.sch-dayhead .dn{color:#718087;font-weight:700}.sch-dayhead .dd{width:38px;height:38px;margin-top:4px;color:#29434a}.sch-dayhead.today .dn{color:var(--itqan-primary);font-weight:800}.sch-dayhead.today .dd{color:#fff;background:linear-gradient(135deg,var(--itqan-primary),var(--itqan-primary-dark));box-shadow:0 6px 14px rgba(0,124,133,.20)}.sch-col{min-width:126px;border-left:1px solid #edf2f1}.sch-col.today{background:rgba(0,124,133,.025)}
+.sch-ev{border-radius:10px;padding:6px 8px;border-right-width:4px;box-shadow:0 3px 10px rgba(0,74,93,.08);font-size:11.5px;line-height:1.45}.sch-ev:hover{transform:translateY(-1px) scale(1.01);box-shadow:0 9px 20px rgba(0,74,93,.16)}.sch-ev .t{font-weight:800}.sch-ev .s{color:#53686e}.sch-ev.s-done{opacity:.72}.sch-ev.s-wait{outline:2px solid rgba(214,174,85,.55)}.sch-now{border-top-color:#d94b4b}.sch-now::before{background:#d94b4b;box-shadow:0 0 0 4px rgba(217,75,75,.10)}.sch-legend{padding:12px 2px 0;color:#607178}.sch-legend span{display:inline-flex;align-items:center;padding:6px 9px;background:#f8fbfa;border:1px solid #e5edeb;border-radius:999px}
+.pay-bar{padding:10px 30px;background:rgba(247,250,249,.95);border-bottom:1px solid #e1e9e7}.pay-card{border-radius:15px;background:linear-gradient(135deg,var(--itqan-primary-dark),var(--itqan-primary));box-shadow:0 8px 22px rgba(0,74,93,.16)}
+#loginOverlay{background:#eef5f4}.login-box{border-radius:24px;border:1px solid rgba(255,255,255,.8);box-shadow:0 28px 70px rgba(0,74,93,.18)}
+button,input,select,textarea{font-family:inherit}:focus-visible{outline:3px solid rgba(0,124,133,.28);outline-offset:2px}
+@media(max-width:900px){.sidebar{width:220px;flex-basis:220px}.main{padding:24px 18px}.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.header{padding:12px 16px;min-height:68px}.brand{font-size:17px}.subtitle{font-size:11px}.layout{min-height:calc(100vh - 68px)}.sidebar{display:none}.main{padding:20px 12px}.page-title{font-size:24px}.section{padding:16px;border-radius:16px}.cards{grid-template-columns:1fr 1fr;gap:10px}.card{min-height:125px;padding:15px}.card-number{font-size:26px}.section-header{align-items:flex-start;flex-direction:column}.sch-bar .sch-range{order:0;text-align:right}.sch-scroll{max-height:calc(100vh - 300px);min-height:420px}}
+@media(max-width:430px){.cards{grid-template-columns:1fr}.card{min-height:112px}.user-bar{left:12px}.user-bar #userBarName{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+</style>
+
 </head>
 
 
@@ -2412,6 +2888,7 @@ textarea:focus-visible {
   <div class="subtitle">
     خطوات نحو القرآن
   </div>
+
   
     <div class="user-bar" id="userBar">
       <span id="userBarName"></span>
@@ -2479,7 +2956,7 @@ textarea:focus-visible {
   💳 الاشتراكات
   </div>
 
-    <div class="menu-item student-only"
+  <div class="menu-item student-only"
        onclick="showMyReports(this)">
     📝 التقارير
   </div>
@@ -2487,6 +2964,17 @@ textarea:focus-visible {
   <div class="menu-item" onclick="showSalaries(this)">
   💰 الرواتب
   </div>
+
+  <div class="menu-item" onclick="showChat(this)">
+    💬 المحادثات <span class="ch-menu-badge" id="chatMenuBadge"></span>
+  </div>
+    
+    <div class="menu-item"
+        onclick="showReportTemplates(this)">
+      🧩 قوالب التقارير
+    </div>
+
+    
 
     <div class="menu-item"
         onclick="showUsers(this)">
@@ -2843,7 +3331,7 @@ textarea:focus-visible {
 
       <button class="btn btn-primary"
               onclick="saveStudent()">
-        💾 حفظ الطالب
+         حفظ الطالب
       </button>
 
       <button class="btn btn-secondary"
@@ -2868,9 +3356,16 @@ const SECURED = new Set([
   'getStudents',
   'getStudentProfile',
   'getLessons',
+  'getLessonsForDate',
+  'getLessonsForRange',
+  'getLessonFlagsForRange',
   'getSubscriptions',
   'getStudentReports',
   'getReportById',
+  'getReportTemplates',
+  'getLessonReportForm',
+  'saveReportTemplate',
+  'resetReportTemplate',
   'getDashboardData',
   'getTeachers',
   'saveTeacher',
@@ -2891,7 +3386,11 @@ const SECURED = new Set([
   'saveUser',
   'deleteUser',
   'markPayrollPaid',
-  'getMyPayroll'  
+  'getMyPayroll',
+  'getChatContacts',
+  'getChatMessages',
+  'sendChatMessage',
+  'chatPoll'  
 ]);
 
 function wrapRunner(runner) {
@@ -2986,6 +3485,8 @@ function doLogin() {
       btn.disabled = false;
       btn.textContent = 'دخول';
       saveSession_(result.token, result.user);
+      window.itqanSessionToken = result.token;
+      window.itqanCurrentUser = result.user;
       startApp_(result.user, true);
     })
     .withFailureHandler(function(error) {
@@ -3039,13 +3540,15 @@ const MENU_PAGE_BY_HANDLER = {
   showSubscriptions: 'subscriptions',
   showMyReports: 'myreports',
   showUsers: 'users',
-  showSalaries: 'salaries'
+  showSalaries: 'salaries',
+  showReportTemplates: 'reporttemplates',
+  showChat: 'chat'
 };
 
 // الصفحات المسموحة لكل دور (الأدمن: كل الصفحات)
 const ROLE_PAGES = {
-  teacher: ['lessons', 'students'],
-  student: ['lessons', 'subscriptions', 'myreports']
+  teacher: ['lessons', 'students', 'chat'],
+  student: ['lessons', 'subscriptions', 'myreports', 'chat']
 };
 
 // الصفحة الرئيسية لكل دور عند تسجيل الدخول
@@ -3073,6 +3576,7 @@ function applyRoleUI_(role, goHome) {
   } else if (allowed && allowed.indexOf(getCurrentPage()) === -1) {
     setCurrentPage(ROLE_HOME[role] || allowed[0] || 'lessons');
   }
+  startChatPolling_();
 }
 
 /* ======================
@@ -3284,7 +3788,7 @@ function buildPayrollHtml_(data) {
           <button type="button" class="btn btn-primary"
                   data-pr-btn="${id}"
                   onclick="savePayrollRow('${id}', '${escapeHtml(item.month)}')">
-            💾 حفظ
+            حفظ
           </button>
         `);
       }
@@ -3293,7 +3797,7 @@ function buildPayrollHtml_(data) {
           <button type="button" class="btn btn-primary pr-pay-btn"
                   data-pr-btn="${id}"
                   onclick="payPayrollRow('${id}', '${escapeHtml(item.month)}')">
-            💰 دفع
+            دفع
           </button>
         `);
       }
@@ -3600,6 +4104,7 @@ function showMySubscriptions(element) {
 /* ---------- التقارير ---------- */
 
 function buildMyReportsHtml_(data) {
+
   if (!data || !data.length) {
     return `
       <div class="empty">
@@ -3610,6 +4115,8 @@ function buildMyReportsHtml_(data) {
     `;
   }
 
+  const templates = REPORT_TEMPLATES_CACHE || {};
+
   // الأحدث أولًا (السيرفر بيرتبها من الأقدم للأحدث)
   const reports = data.slice().reverse();
 
@@ -3618,26 +4125,63 @@ function buildMyReportsHtml_(data) {
   `;
 
   reports.forEach(function(r) {
+
+    const fields = reportDisplayFields_(r, templates);
+
+    const levelField = fields.find(function(f) {
+      return f.key === 'level' && f.value && String(f.value).trim() !== '';
+    });
+
+    const wide = fields.filter(function(f) {
+      return f.key !== 'level' && f.type === 'textarea';
+    });
+
+    const short = fields.filter(function(f) {
+      return f.key !== 'level' && f.type !== 'textarea';
+    });
+
+    // نفس شكل القديم: الملخص أولًا، ثم الحقول القصيرة، ثم باقي الحقول الطويلة
+    const summaryField = wide.find(function(f) { return f.key === 'summary'; });
+    const notesField = wide.find(function(f) { return f.key === 'notes'; });
+    const otherWide = wide.filter(function(f) {
+      return f.key !== 'summary' && f.key !== 'notes';
+    });
+
     html += `
       <div class="sp-report">
+
         <div class="sp-report-head">
           <div class="sp-report-date">📅 ${escapeHtml(spDate_(r.date))}</div>
           <div>
-            ${r.level
-              ? '<span class="sp-chip sp-chip-gray">المستوى: ' + escapeHtml(r.level) + '</span>'
+            ${r.program
+              ? '<span class="sp-chip sp-chip-gray">' + escapeHtml(r.program) + '</span> '
+              : ''}
+            ${levelField
+              ? '<span class="sp-chip sp-chip-gray">' + escapeHtml(levelField.label) + ': ' + escapeHtml(levelField.value) + '</span>'
               : ''}
           </div>
         </div>
+
         <div class="sp-report-body">
-          ${spField_('ملخص الحصة', r.summary)}
-          <div class="sp-grid-2">
-            ${spField_('مقدار الحفظ', r.memorization)}
-            ${spField_('الواجب', r.homework)}
-          </div>
-          ${r.notes && String(r.notes).trim() !== ''
-            ? '<div class="sp-notes">' + spField_('ملاحظات', r.notes) + '</div>'
+
+          ${summaryField ? spField_(summaryField.label, summaryField.value) : ''}
+
+          ${short.length
+            ? '<div class="sp-grid-2">' +
+                short.map(function(f) { return spField_(f.label, f.value); }).join('') +
+              '</div>'
             : ''}
+
+          ${otherWide.map(function(f) {
+            return spField_(f.label, f.value);
+          }).join('')}
+
+          ${notesField && notesField.value && String(notesField.value).trim() !== ''
+            ? '<div class="sp-notes">' + spField_(notesField.label, notesField.value) + '</div>'
+            : ''}
+
         </div>
+
       </div>
     `;
   });
@@ -3664,13 +4208,15 @@ function showMyReports(element) {
     .withSuccessHandler(function(data) {
       const box = document.getElementById('myReportsBox');
       if (!box) return;
-      try {
-        box.innerHTML = buildMyReportsHtml_(data || []);
-      } catch (e) {
-        box.innerHTML =
-          '<div class="empty">تعذر عرض التقارير: ' +
-          escapeHtml(String(e.message || e)) + '</div>';
-      }
+      loadReportTemplates_(function() {
+        try {
+          box.innerHTML = buildMyReportsHtml_(data || []);
+        } catch (e) {
+          box.innerHTML =
+            '<div class="empty">تعذر عرض التقارير: ' +
+            escapeHtml(String(e.message || e)) + '</div>';
+        }
+      });
     })
     .withFailureHandler(function(error) {
       const box = document.getElementById('myReportsBox');
@@ -3969,7 +4515,7 @@ function ensureUserModal_() {
       <div style="display:flex; gap:10px; margin-top:18px;">
         <button class="btn btn-primary" id="userSaveBtn"
                 onclick="saveUserUI()">
-          💾 حفظ
+          حفظ
         </button>
         <button class="btn btn-secondary" onclick="closeUserModal()">
           إلغاء
@@ -4051,7 +4597,7 @@ function openUserModal(username) {
 
   document.getElementById('userError').textContent = '';
   document.getElementById('userSaveBtn').disabled = false;
-  document.getElementById('userSaveBtn').textContent = '💾 حفظ';
+  document.getElementById('userSaveBtn').textContent = 'حفظ';
 
   const usernameInput = document.getElementById('userUsername');
   const roleSelect = document.getElementById('userRole');
@@ -4149,7 +4695,7 @@ function saveUserUI() {
   server
     .withSuccessHandler(function() {
       btn.disabled = false;
-      btn.textContent = '💾 حفظ';
+      btn.textContent = 'حفظ';
       closeUserModal();
       loadUsers();
 
@@ -4166,7 +4712,7 @@ function saveUserUI() {
     })
     .withFailureHandler(function(error) {
       btn.disabled = false;
-      btn.textContent = '💾 حفظ';
+      btn.textContent = 'حفظ';
       errorBox.textContent =
         String(error.message || error).replace(/^Error:\s*/, '');
     })
@@ -4313,6 +4859,23 @@ function restoreCurrentPage() {
       if (item) {
         showUsers(item);
       }
+      break;
+    }
+    case 'reporttemplates': {
+      const item =
+        document.querySelector(
+          '.menu-item[onclick^="showReportTemplates"]'
+        );
+      if (item) {
+        showReportTemplates(item);
+      }
+      break;
+    }
+    
+    
+    case 'chat': {
+      const item = document.querySelector('.menu-item[onclick^="showChat"]');
+      if (item) showChat(item);
       break;
     }
     
@@ -4474,7 +5037,7 @@ function showStudents(element) {
 
         <button class="btn btn-primary"
                 onclick="openAddStudent()">
-          ➕ إضافة طالب
+           إضافة طالب
         </button>
 
       </div>
@@ -5083,6 +5646,14 @@ function renderStudentReports(student, reports) {
 
   if (!container) return;
 
+  // نحتاج قوالب التقارير أولًا (تتحمّل مرة واحدة وتتخزن)
+  if (!REPORT_TEMPLATES_CACHE && !arguments[2]) {
+    loadReportTemplates_(function() {
+      renderStudentReports(student, reports, true);
+    });
+    return;
+  }
+
   // ترتيب التقارير من الأقدم إلى الأحدث
   reports.sort(function(a, b) {
 
@@ -5120,6 +5691,23 @@ function renderStudentReports(student, reports) {
   }
 
 
+  // تجميع كافة الحقول (العناوين/البنود) الفريدة لإنشاء أعمدة الجدول الديناميكية
+  const dynamicHeadersMap = {};
+  
+  reports.forEach(function(report) {
+    const fields = reportDisplayFields_(
+      report,
+      REPORT_TEMPLATES_CACHE || {}
+    );
+    fields.forEach(function(f) {
+      if (f.label && !dynamicHeadersMap[f.label]) {
+        dynamicHeadersMap[f.label] = true;
+      }
+    });
+  });
+
+  const dynamicHeaders = Object.keys(dynamicHeadersMap);
+
   let html = `
 
     <div style="
@@ -5149,13 +5737,44 @@ function renderStudentReports(student, reports) {
     </div>
 
     <div style="
-      display:flex;
-      flex-direction:column;
-      gap:16px;
+      width:100%;
+      overflow-x:auto;
+      background:#fff;
+      border:1px solid #e5e5e5;
+      border-radius:14px;
+      box-shadow:0 3px 12px rgba(0,0,0,.06);
     ">
+      <table style="
+        width:100%;
+        border-collapse:collapse;
+        text-align:right;
+        font-size:14px;
+        min-width:700px;
+      ">
+        <thead>
+          <tr style="
+            background:#f8f9fa;
+            border-bottom:2px solid #e5e5e5;
+            color:#333;
+          ">
+            <th style="padding:14px 16px; width:70px; text-align:center;">#</th>
+            <th style="padding:14px 16px; min-width:110px;">📅 التاريخ</th>
+            <th style="padding:14px 16px; min-width:120px;">📘 البرنامج</th>
+            <th style="padding:14px 16px; min-width:130px;">👨‍🏫 المدرس</th>
   `;
 
+  // إضافة أعمدة بنود التقرير كعناوين للجدول
+  dynamicHeaders.forEach(function(headerLabel) {
+    html += `<th style="padding:14px 16px; min-width:150px;">${escapeHtml(headerLabel)}</th>`;
+  });
 
+  html += `
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  // بناء الصفوف لتقارير الحصص
   reports.forEach(function(report, index) {
 
     const date =
@@ -5169,158 +5788,69 @@ function renderStudentReports(student, reports) {
       report.teacherName ||
       'غير محدد';
 
-    const summary =
-      report.summary ||
-      report.lessonSummary ||
-      report['ملخص الحصة'] ||
-      '';
+    const fields = reportDisplayFields_(
+      report,
+      REPORT_TEMPLATES_CACHE || {}
+    );
 
-    const level =
-      report.level ||
-      report.studentLevel ||
-      report['مستوى الطالب'] ||
-      '';
+    // تحويل الحقول لخارطة للوصول السريع حسب اسم البند (label)
+    const fieldValuesMap = {};
+    fields.forEach(function(f) {
+      fieldValuesMap[f.label] = f.value;
+    });
 
-    const memorization =
-      report.memorization ||
-      report.amount ||
-      report['مقدار الحفظ'] ||
-      '';
-
-    const homework =
-      report.homework ||
-      report['الواجب'] ||
-      '';
-
-    const notes =
-      report.notes ||
-      report['ملاحظات'] ||
-      '';
-
+    const rowBg = (index % 2 === 0) ? '#ffffff' : '#fcfcfc';
 
     html += `
-
-      <div style="
-        background:#fff;
-        border:1px solid #e5e5e5;
-        border-radius:14px;
-        padding:20px;
-        box-shadow:0 3px 12px rgba(0,0,0,.06);
+      <tr style="
+        background:${rowBg};
+        border-bottom:1px solid #eee;
+        transition:background 0.2s;
       ">
+        <td style="padding:12px 16px; text-align:center; font-weight:bold; color:#006c75;">
+          ${index + 1}
+        </td>
 
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          align-items:center;
-          gap:10px;
-          flex-wrap:wrap;
-          margin-bottom:15px;
-          padding-bottom:12px;
-          border-bottom:1px solid #eee;
-        ">
+        <td style="padding:12px 16px; white-space:nowrap; color:#555;">
+          ${escapeHtml(formatReportDate(date))}
+        </td>
 
-          <div>
+        <td style="padding:12px 16px; white-space:nowrap;">
+          ${report.program
+            ? '<span style="background:#eef6f6;color:#006c75;padding:3px 10px;border-radius:20px;font-size:12px;display:inline-block;">' +
+                escapeHtml(report.program) + '</span>'
+            : '—'}
+        </td>
 
-            <strong style="font-size:17px;">
-              📚 الحصة رقم ${index + 1}
-            </strong>
-
-          </div>
-
-          <div style="
-            color:#777;
-            font-size:14px;
-          ">
-            📅 ${escapeHtml(formatReportDate(date))}
-          </div>
-
-        </div>
-
-
-        <div style="
-          display:grid;
-          grid-template-columns:
-            repeat(auto-fit,minmax(200px,1fr));
-          gap:12px;
-          margin-bottom:15px;
-        ">
-
-          <div>
-            <strong>👨‍🏫 المدرس:</strong>
-            ${escapeHtml(teacher)}
-          </div>
-
-          <div>
-            <strong>📊 مستوى الطالب:</strong>
-            ${escapeHtml(level)}
-          </div>
-
-          <div>
-            <strong>📖 مقدار الحفظ:</strong>
-            ${escapeHtml(memorization)}
-          </div>
-
-        </div>
-
-
-        <div style="margin-bottom:12px;">
-
-          <strong>📝 ملخص الحصة</strong>
-
-          <div style="
-            background:#fafafa;
-            padding:12px;
-            border-radius:8px;
-            margin-top:6px;
-            line-height:1.8;
-          ">
-            ${escapeHtml(summary || 'لا يوجد')}
-          </div>
-
-        </div>
-
-
-        <div style="margin-bottom:12px;">
-
-          <strong>📚 الواجب</strong>
-
-          <div style="
-            background:#fafafa;
-            padding:12px;
-            border-radius:8px;
-            margin-top:6px;
-            line-height:1.8;
-          ">
-            ${escapeHtml(homework || 'لا يوجد')}
-          </div>
-
-        </div>
-
-
-        <div>
-
-          <strong>💬 ملاحظات</strong>
-
-          <div style="
-            background:#fafafa;
-            padding:12px;
-            border-radius:8px;
-            margin-top:6px;
-            line-height:1.8;
-          ">
-            ${escapeHtml(notes || 'لا توجد')}
-          </div>
-
-        </div>
-
-      </div>
-
+        <td style="padding:12px 16px; white-space:nowrap; font-weight:500;">
+          ${escapeHtml(teacher)}
+        </td>
     `;
 
+    // طباعة قيمة كل بند في جلسته المحددة
+    dynamicHeaders.forEach(function(headerLabel) {
+      const val = fieldValuesMap[headerLabel];
+      html += `
+        <td style="
+          padding:12px 16px;
+          line-height:1.6;
+          white-space:pre-wrap;
+          vertical-align:top;
+          color:#444;
+        ">
+          ${escapeHtml(val || '—')}
+        </td>
+      `;
+    });
+
+    html += `</tr>`;
   });
 
-
-  html += `</div>`;
+  html += `
+        </tbody>
+      </table>
+    </div>
+  `;
 
   container.innerHTML = html;
 }
@@ -5837,7 +6367,7 @@ function saveStudent() {
         saveButton.disabled = false;
 
         saveButton.innerText =
-          '💾 حفظ الطالب';
+          'حفظ الطالب';
 
       }
 
@@ -5867,7 +6397,7 @@ function saveStudent() {
         saveButton.disabled = false;
 
         saveButton.innerText =
-          '💾 حفظ الطالب';
+          'حفظ الطالب';
 
       }
 
@@ -6031,7 +6561,7 @@ function showTeachers(element) {
 
         <button class="btn btn-primary"
                 onclick="openAddTeacher()">
-          ➕ إضافة مدرس
+           إضافة مدرس
         </button>
 
       </div>
@@ -6199,7 +6729,7 @@ function renderTeachers(data) {
             class="btn btn-secondary"
             onclick="showTeacherProfile('${teacher.id}')">
 
-            👤 عرض بيانات المعلم
+             عرض بيانات المعلم
 
           </button>
 
@@ -6208,7 +6738,7 @@ function renderTeachers(data) {
             class="btn btn-secondary"
             onclick="editTeacher('${teacher.id}')">
 
-            ✏️ تعديل
+             تعديل
 
           </button>
 
@@ -6217,7 +6747,7 @@ function renderTeachers(data) {
             class="btn btn-danger"
             onclick="deleteTeacherConfirm('${teacher.id}')">
 
-            🗑️ حذف
+             حذف
 
           </button>
 
@@ -6411,7 +6941,7 @@ function openAddTeacher() {
             class="btn btn-primary"
             onclick="saveNewTeacher()">
 
-            💾 حفظ المدرس
+            حفظ المدرس
 
           </button>
 
@@ -6747,7 +7277,7 @@ function editTeacher(id) {
           class="btn btn-primary"
           onclick="updateTeacher('${teacher.id}')">
 
-          💾 حفظ التعديلات
+          حفظ التعديلات
 
         </button>
 
@@ -7427,7 +7957,7 @@ function showLessons(element) {
           class="btn btn-primary"
           onclick="openAddLesson()">
 
-          ➕ إضافة حصة
+           إضافة حصة
 
         </button>
 
@@ -7644,7 +8174,7 @@ function loadLessonsForSelectedDate() {
 
     })
 
-    .getLessons();
+    .getLessonsForDate(selectedDate);
 
 }
 
@@ -7767,7 +8297,7 @@ function loadLessonsToday() {
 
     })
 
-    .getLessons();
+    .getLessonsForDate(today);
 
 }
 
@@ -8075,7 +8605,7 @@ function renderAddLessonForm() {
           type="button"
           class="btn btn-primary"
           onclick="saveNewLesson()">
-          💾 حفظ الحصة
+          حفظ الحصة
         </button>
 
       </div>
@@ -8243,8 +8773,6 @@ function loadLessons() {
   server
 
     .withSuccessHandler(function(data) {
-
-      console.log('بيانات الحصص:', data);
 
       allLessons = data || [];
 
@@ -8797,8 +9325,79 @@ function openLessonReport(lessonId) {
     return;
   }
 
-  const modal = getSystemModal('lessonReportModal');
+  server
+    .withSuccessHandler(function(form) {
+      renderLessonReportModal_(
+        lesson,
+        form || { program: '', fields: [] }
+      );
+    })
+    .withFailureHandler(function(error) {
+      alert(
+        'تعذر تحميل نموذج التقرير:\n' +
+        (error.message || error)
+      );
+    })
+    .getLessonReportForm(lessonId);
+}
 
+/**
+ * بناء حقول النموذج حسب قالب البرنامج
+ */
+function buildReportFormFieldsHtml_(fields) {
+
+  return (fields || []).map(function(f) {
+
+    const wide = (f.type === 'textarea')
+      ? ' style="grid-column:1/-1;"'
+      : '';
+
+    const attrs =
+      'class="lr-field" ' +
+      'data-key="' + escapeHtml(f.key) + '" ' +
+      'data-label="' + escapeHtml(f.label) + '" ' +
+      'data-required="' + (f.required ? '1' : '0') + '"';
+
+    let control = '';
+
+    if (f.type === 'textarea') {
+
+      control =
+        '<textarea ' + attrs + ' rows="3" placeholder="' +
+        escapeHtml(f.placeholder || '') + '"></textarea>';
+
+    } else if (f.type === 'select') {
+
+      control =
+        '<select ' + attrs + '><option value="">اختر</option>' +
+        (f.options || []).map(function(o) {
+          return '<option value="' + escapeHtml(o) + '">' +
+            escapeHtml(o) + '</option>';
+        }).join('') +
+        '</select>';
+
+    } else {
+
+      control =
+        '<input type="text" ' + attrs + ' placeholder="' +
+        escapeHtml(f.placeholder || '') + '">';
+    }
+
+    return (
+      '<div class="form-group"' + wide + '>' +
+        '<label>' + escapeHtml(f.label) +
+          (f.required ? ' *' : '') +
+        '</label>' +
+        control +
+      '</div>'
+    );
+
+  }).join('');
+}
+
+function renderLessonReportModal_(lesson, form) {
+
+  const modal = getSystemModal('lessonReportModal');
   activeSystemModal = modal;
 
   if (!modal) {
@@ -8806,12 +9405,15 @@ function openLessonReport(lessonId) {
     return;
   }
 
+  const programText = form.program
+    ? form.program
+    : 'غير محدد (تقرير عام)';
+
   modal.innerHTML = `
     <div class="modal-content">
 
       <div class="modal-header">
         <h2>📝 تقرير الحصة</h2>
-
         <button
           type="button"
           class="close-btn"
@@ -8824,103 +9426,42 @@ function openLessonReport(lessonId) {
 
         <div class="form-group">
           <label>رقم الحصة</label>
-          <input
-            type="text"
-            value="${escapeHtml(lesson.id)}"
-            readonly>
+          <input type="text" value="${escapeHtml(lesson.id)}" readonly>
         </div>
 
         <div class="form-group">
           <label>تاريخ الحصة</label>
-          <input
-            type="text"
-            value="${escapeHtml(lesson.date || '')}"
-            readonly>
+          <input type="text" value="${escapeHtml(lesson.date || '')}" readonly>
         </div>
 
         <div class="form-group">
           <label>رقم الطالب</label>
-          <input
-            type="text"
-            value="${escapeHtml(lesson.studentId || '')}"
-            readonly>
+          <input type="text" value="${escapeHtml(lesson.studentId || '')}" readonly>
         </div>
 
         <div class="form-group">
           <label>اسم الطالب</label>
-          <input
-            type="text"
-            value="${escapeHtml(lesson.studentName || '')}"
-            readonly>
+          <input type="text" value="${escapeHtml(lesson.studentName || '')}" readonly>
+        </div>
+
+        <div class="form-group">
+          <label>البرنامج</label>
+          <input type="text" value="${escapeHtml(programText)}" readonly>
         </div>
 
         <div class="form-group">
           <label>المدرس</label>
-          <input
-            type="text"
-            value="${escapeHtml(lesson.teacherName || '')}"
-            readonly>
+          <input type="text" value="${escapeHtml(lesson.teacherName || '')}" readonly>
         </div>
 
         <div class="form-group">
           <label>مدة الحصة</label>
-          <input
-            type="text"
-            value="${escapeHtml(String(lesson.duration || 30))} دقيقة"
-            readonly>
+          <input type="text"
+                 value="${escapeHtml(String(lesson.duration || 30))} دقيقة"
+                 readonly>
         </div>
 
-        <div class="form-group" style="grid-column:1/-1;">
-          <label>ملخص الحصة *</label>
-
-          <textarea
-            id="lessonReportSummary"
-            rows="4"
-            placeholder="اكتب ملخصًا مختصرًا لما تم في الحصة..."></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>مستوى الطالب</label>
-
-          <select id="lessonReportLevel">
-
-            <option value="">اختر المستوى</option>
-
-            <option value="ممتاز">ممتاز</option>
-            <option value="جيد جدًا">جيد جدًا</option>
-            <option value="جيد">جيد</option>
-            <option value="يحتاج متابعة">يحتاج متابعة</option>
-            <option value="يحتاج تحسين">يحتاج تحسين</option>
-
-          </select>
-        </div>
-
-        <div class="form-group">
-          <label>مقدار الحفظ</label>
-
-          <input
-            type="text"
-            id="lessonReportMemorization"
-            placeholder="مثال: حفظ 5 آيات">
-        </div>
-
-        <div class="form-group" style="grid-column:1/-1;">
-          <label>الواجب</label>
-
-          <textarea
-            id="lessonReportHomework"
-            rows="3"
-            placeholder="اكتب المطلوب من الطالب للحصة القادمة..."></textarea>
-        </div>
-
-        <div class="form-group" style="grid-column:1/-1;">
-          <label>ملاحظات</label>
-
-          <textarea
-            id="lessonReportNotes"
-            rows="3"
-            placeholder="أي ملاحظات إضافية عن الطالب..."></textarea>
-        </div>
+        ${buildReportFormFieldsHtml_(form.fields)}
 
       </div>
 
@@ -8937,7 +9478,7 @@ function openLessonReport(lessonId) {
           type="button"
           class="btn btn-primary"
           onclick="saveLessonReportUI('${lesson.id}')">
-          💾 حفظ التقرير وإنهاء الحصة
+          حفظ التقرير وإنهاء الحصة
         </button>
 
       </div>
@@ -8948,63 +9489,40 @@ function openLessonReport(lessonId) {
   modal.style.display = 'flex';
 }
 
-
 /**
  * حفظ تقرير الحصة
  */
 function saveLessonReportUI(lessonId) {
 
-  const summary = document
-    .getElementById('lessonReportSummary')
-    .value
-    .trim();
+  const fieldEls = document.querySelectorAll(
+    '#lessonReportModal .lr-field'
+  );
 
-  const level = document
-    .getElementById('lessonReportLevel')
-    .value;
+  const values = {};
 
-  const memorization = document
-    .getElementById('lessonReportMemorization')
-    .value
-    .trim();
+  for (let i = 0; i < fieldEls.length; i++) {
 
-  const homework = document
-    .getElementById('lessonReportHomework')
-    .value
-    .trim();
+    const el = fieldEls[i];
+    const val = String(el.value || '').trim();
 
-  const notes = document
-    .getElementById('lessonReportNotes')
-    .value
-    .trim();
+    if (el.getAttribute('data-required') === '1' && !val) {
+      alert('من فضلك املأ الحقل: ' + el.getAttribute('data-label'));
+      el.focus();
+      return;
+    }
 
-
-  if (!summary) {
-    alert('من فضلك اكتب ملخص الحصة.');
-    return;
+    values[el.getAttribute('data-key')] = val;
   }
 
-
-  const report = {
-    summary: summary,
-    level: level,
-    memorization: memorization,
-    homework: homework,
-    notes: notes
-  };
-
-
   const buttons = document.querySelectorAll(
-    '#studentModal .modal-actions button'
+    '#lessonReportModal .modal-actions button'
   );
 
   buttons.forEach(function(button) {
     button.disabled = true;
   });
 
-
   server
-
     .withSuccessHandler(function(result) {
 
       alert(
@@ -9016,12 +9534,9 @@ function saveLessonReportUI(lessonId) {
       );
 
       closeModal();
-
       loadLessonsForSelectedDate();
-      refreshMyPay_();  
-
+      refreshMyPay_();
     })
-
     .withFailureHandler(function(error) {
 
       buttons.forEach(function(button) {
@@ -9032,13 +9547,11 @@ function saveLessonReportUI(lessonId) {
         'حدث خطأ أثناء حفظ التقرير:\n' +
         error.message
       );
+
       loadLessonsForSelectedDate();
-
     })
-
-    .saveLessonReport(lessonId, report);
+    .saveLessonReport(lessonId, { values: values });
 }
-
 
 /**
  * عرض تقرير حصة مكتملة
@@ -9092,7 +9605,6 @@ function viewLessonReport(lessonId) {
 function showReportViewModal(lesson, report) {
 
   const modal = getSystemModal('viewReportModal');
-
   activeSystemModal = modal;
 
   if (!modal) {
@@ -9100,135 +9612,105 @@ function showReportViewModal(lesson, report) {
     return;
   }
 
+  loadReportTemplates_(function(templates) {
 
-  modal.innerHTML = `
-    <div class="modal-content">
+    const fields = reportDisplayFields_(report, templates);
 
-      <div class="modal-header">
+    const fieldsHtml = fields.map(function(f) {
 
-        <h2>👁️ تقرير الحصة</h2>
+      if (f.type === 'textarea') {
+        return (
+          '<div class="form-group" style="grid-column:1/-1;">' +
+            '<label>' + escapeHtml(f.label) + '</label>' +
+            '<textarea rows="3" readonly>' +
+              escapeHtml(f.value || '') +
+            '</textarea>' +
+          '</div>'
+        );
+      }
 
-        <button
-          type="button"
-          class="close-btn"
-          onclick="closeModal()">
-          ✕
-        </button>
+      return (
+        '<div class="form-group">' +
+          '<label>' + escapeHtml(f.label) + '</label>' +
+          '<input type="text" value="' +
+            escapeHtml(f.value || '') + '" readonly>' +
+        '</div>'
+      );
 
-      </div>
+    }).join('');
 
+    modal.innerHTML = `
+      <div class="modal-content">
 
-      <div class="form-grid">
-
-        <div class="form-group">
-          <label>رقم التقرير</label>
-          <input
-            type="text"
-            value="${escapeHtml(report.id || '')}"
-            readonly>
+        <div class="modal-header">
+          <h2>👁️ تقرير الحصة</h2>
+          <button
+            type="button"
+            class="close-btn"
+            onclick="closeModal()">
+            ✕
+          </button>
         </div>
 
-        <div class="form-group">
-          <label>رقم الحصة</label>
-          <input
-            type="text"
-            value="${escapeHtml(lesson.id || '')}"
-            readonly>
+        <div class="form-grid">
+
+          <div class="form-group">
+            <label>رقم التقرير</label>
+            <input type="text" value="${escapeHtml(report.id || '')}" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>رقم الحصة</label>
+            <input type="text" value="${escapeHtml(lesson.id || '')}" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>الطالب</label>
+            <input type="text" value="${escapeHtml(report.studentName || '')}" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>البرنامج</label>
+            <input type="text"
+                   value="${escapeHtml(report.program || 'تقرير عام')}"
+                   readonly>
+          </div>
+
+          <div class="form-group">
+            <label>المدرس</label>
+            <input type="text" value="${escapeHtml(report.teacher || '')}" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>تاريخ الحصة</label>
+            <input type="text" value="${escapeHtml(report.lessonDate || '')}" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>وقت إنشاء التقرير</label>
+            <input type="text" value="${escapeHtml(report.createdAt || '')}" readonly>
+          </div>
+
+          ${fieldsHtml}
+
         </div>
 
-        <div class="form-group">
-          <label>الطالب</label>
-          <input
-            type="text"
-            value="${escapeHtml(report.studentName || '')}"
-            readonly>
-        </div>
-
-        <div class="form-group">
-          <label>المدرس</label>
-          <input
-            type="text"
-            value="${escapeHtml(report.teacher || '')}"
-            readonly>
-        </div>
-
-        <div class="form-group">
-          <label>تاريخ الحصة</label>
-          <input
-            type="text"
-            value="${escapeHtml(report.lessonDate || '')}"
-            readonly>
-        </div>
-
-        <div class="form-group">
-          <label>وقت إنشاء التقرير</label>
-          <input
-            type="text"
-            value="${escapeHtml(report.createdAt || '')}"
-            readonly>
-        </div>
-
-        <div class="form-group" style="grid-column:1/-1;">
-          <label>ملخص الحصة</label>
-
-          <textarea
-            rows="4"
-            readonly>${escapeHtml(report.summary || '')}</textarea>
-        </div>
-
-        <div class="form-group">
-          <label>مستوى الطالب</label>
-
-          <input
-            type="text"
-            value="${escapeHtml(report.level || '')}"
-            readonly>
-        </div>
-
-        <div class="form-group">
-          <label>مقدار الحفظ</label>
-
-          <input
-            type="text"
-            value="${escapeHtml(report.memorization || '')}"
-            readonly>
-        </div>
-
-        <div class="form-group" style="grid-column:1/-1;">
-          <label>الواجب</label>
-
-          <textarea
-            rows="3"
-            readonly>${escapeHtml(report.homework || '')}</textarea>
-        </div>
-
-        <div class="form-group" style="grid-column:1/-1;">
-          <label>ملاحظات</label>
-
-          <textarea
-            rows="3"
-            readonly>${escapeHtml(report.notes || '')}</textarea>
+        <div class="modal-actions">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="closeModal()">
+            إغلاق
+          </button>
         </div>
 
       </div>
+    `;
 
-
-      <div class="modal-actions">
-
-        <button
-          type="button"
-          class="btn btn-secondary"
-          onclick="closeModal()">
-          إغلاق
-        </button>
-
-      </div>
-
-    </div>
-  `;
-
-  modal.style.display = 'flex';
+    modal.style.display = 'flex';
+  });
 }
+
 
 
 /* ====================================================================================================================
@@ -9247,111 +9729,211 @@ function showSubscriptions(element) {
   document.getElementById('mainContent').innerHTML = `
 
     <div class="page-title">
+
       إدارة الاشتراكات
+
     </div>
+
+
 
     <div class="section">
 
+
+
       <div class="section-header">
 
+
+
         <h2>
+
           قائمة الاشتراكات
+
         </h2>
 
+
+
         <button
+
           class="btn btn-primary"
+
           onclick="loadSubscriptions()">
+
           🔄 تحديث
+
         </button>
 
-      </div>
 
-      <!-- إحصائيات الاشتراكات -->
-
-      <div class="stats-grid">
-
-        <div class="stat-card">
-
-          <div class="stat-title">
-            إجمالي الاشتراكات
-          </div>
-
-          <div
-            class="stat-value"
-            id="subscriptionsTotal">
-            0
-          </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <div class="stat-title">
-            الاشتراكات النشطة
-          </div>
-
-          <div
-            class="stat-value"
-            id="subscriptionsActive">
-            0
-          </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <div class="stat-title">
-            الحصص المتبقية
-          </div>
-
-          <div
-            class="stat-value"
-            id="subscriptionsRemaining">
-            0
-          </div>
-
-        </div>
-
-
-        <div class="stat-card">
-
-          <div class="stat-title">
-            الاشتراكات المنتهية
-          </div>
-
-          <div
-            class="stat-value"
-            id="subscriptionsFinished">
-            0
-          </div>
-
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-title">اشتراكات غير مدفوعة</div>
-          <div class="stat-value" id="subscriptionsUnpaid">0</div>
-        </div>
 
       </div>
 
+    <div class="section" style="background: transparent; padding: 0; border: none; box-shadow: none;">
 
-      <!-- البحث -->
+      <!-- كروت الإحصائيات بتنسيق زجاجي مميز -->
+      <div class="stats-grid" style="
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 16px;
+        margin-bottom: 24px;
+      ">
 
-      <input
-        class="search"
-        id="subscriptionSearch"
-        placeholder="🔍 ابحث باسم الطالب أو رقم الاشتراك..."
-        oninput="filterSubscriptions()">
+        <!-- إجمالي الاشتراكات -->
+        <div class="stat-card" style="
+          background: #ffffff;
+          padding: 18px 20px;
+          border-radius: 16px;
+          border: 1px solid #f1f5f9;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        ">
+          <div style="position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: #6366f1;"></div>
+          <div class="stat-title" style="font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px;">
+             إجمالي الاشتراكات
+          </div>
+          <div class="stat-value" id="subscriptionsTotal" style="font-size: 26px; font-weight: 800; color: #0f172a;">
+            0
+          </div>
+        </div>
 
+        <!-- الاشتراكات النشطة -->
+        <div class="stat-card" style="
+          background: #ffffff;
+          padding: 18px 20px;
+          border-radius: 16px;
+          border: 1px solid #f1f5f9;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        ">
+          <div style="position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: #10b981;"></div>
+          <div class="stat-title" style="font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px;">
+             الاشتراكات النشطة
+          </div>
+          <div class="stat-value" id="subscriptionsActive" style="font-size: 26px; font-weight: 800; color: #0f172a;">
+            0
+          </div>
+        </div>
 
-      <!-- جدول الاشتراكات -->
+        <!-- الحصص المتبقية -->
+        <div class="stat-card" style="
+          background: #ffffff;
+          padding: 18px 20px;
+          border-radius: 16px;
+          border: 1px solid #f1f5f9;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        ">
+          <div style="position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: #0ea5e9;"></div>
+          <div class="stat-title" style="font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px;">
+             الحصص المتبقية
+          </div>
+          <div class="stat-value" id="subscriptionsRemaining" style="font-size: 26px; font-weight: 800; color: #0f172a;">
+            0
+          </div>
+        </div>
 
-      <div id="subscriptionsTable">
+        <!-- الاشتراكات المنتهية -->
+        <div class="stat-card" style="
+          background: #ffffff;
+          padding: 18px 20px;
+          border-radius: 16px;
+          border: 1px solid #f1f5f9;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        ">
+          <div style="position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: #64748b;"></div>
+          <div class="stat-title" style="font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px;">
+             الاشتراكات المنتهية
+          </div>
+          <div class="stat-value" id="subscriptionsFinished" style="font-size: 26px; font-weight: 800; color: #0f172a;">
+            0
+          </div>
+        </div>
 
-        <div class="loading">
-          جاري تحميل الاشتراكات...
+        <!-- اشتراكات غير مدفوعة -->
+        <div class="stat-card" style="
+          background: #ffffff;
+          padding: 18px 20px;
+          border-radius: 16px;
+          border: 1px solid #f1f5f9;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+          position: relative;
+          overflow: hidden;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        ">
+          <div style="position: absolute; top: 0; right: 0; width: 4px; height: 100%; background: #ef4444;"></div>
+          <div class="stat-title" style="font-size: 13px; font-weight: 600; color: #64748b; margin-bottom: 8px;">
+             اشتراكات غير مدفوعة
+          </div>
+          <div class="stat-value" id="subscriptionsUnpaid" style="font-size: 26px; font-weight: 800; color: #ef4444;">
+            0
+          </div>
+        </div>
+
+      </div>
+
+      <!-- حاوية البحث والعرض -->
+      <div style="
+        background: #ffffff;
+        padding: 20px;
+        border-radius: 18px;
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      ">
+        <!-- شريط البحث المطور -->
+        <div style="position: relative; margin-bottom: 20px;">
+          <input
+            class="search"
+            id="subscriptionSearch"
+            placeholder="ابحث باسم الطالب أو رقم الاشتراك..."
+            oninput="filterSubscriptions()"
+            style="
+              width: 100%;
+              padding: 14px 20px 14px 44px;
+              font-size: 14px;
+              border: 1px solid #e2e8f0;
+              border-radius: 12px;
+              background-color: #f8fafc;
+              color: #1e293b;
+              outline: none;
+              transition: all 0.2s ease;
+              box-sizing: border-box;
+            "
+            onfocus="this.style.backgroundColor='#fff'; this.style.borderColor='#2563eb'; this.style.boxShadow='0 0 0 3px rgba(37,99,235,0.1)';"
+            onblur="this.style.backgroundColor='#f8fafc'; this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"
+          >
+          <span style="
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #94a3b8;
+            pointer-events: none;
+          ">🔍</span>
+        </div>
+
+        <!-- جدول أو كروت الاشتراكات -->
+        <div id="subscriptionsTable" style="min-height: 200px;">
+          <div class="loading" style="
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: #64748b;
+            font-size: 14px;
+            gap: 12px;
+          ">
+            <span style="font-size: 24px; animation: spin 1s linear infinite;">⏳</span>
+            جاري تحميل الاشتراكات...
+          </div>
         </div>
 
       </div>
@@ -9504,7 +10086,7 @@ function renderSubscriptions(data) {
         <button
           class="btn btn-primary"
           onclick="paySubscription('${escapeHtml(String(item.id || ''))}')">
-          💰 دفع
+          دفع
         </button>
       `;
     }
@@ -9722,7 +10304,633 @@ function convertTimeToMinutes(time) {
 }
 
 
+/* =====================================================================================================================================
+   المحادثات النصية (الواجهة) صفحة المحادثات
+  =================================================================================================================================== */
 
+const CHAT = {
+  me: '',
+  userKey: '',
+  ver: null,
+  contacts: [],
+  active: null,        // جهة الاتصال المفتوحة
+  messages: [],
+  role: '',
+  myName: '',
+  filter: 'all',
+  search: '',
+  unread: 0,
+  busy: false,
+  pollTimer: null,
+  openKey: null        // محادثة تُفتح فور دخول الصفحة (من التنبيه)
+};
+
+const CHAT_EMOJIS = [
+  '😀', '😁', '😂', '🤣', '😊', '😍', '🥰', '😘',
+  '😎', '🤗', '🤔', '😅', '😢', '😭', '😡', '🤩',
+  '👍', '👎', '👏', '🙏', '💪', '🤝', '✌️', '👌',
+  '❤️', '💚', '💙', '🌹', '⭐', '✨', '🔥', '🎉',
+  '🎁', '📖', '🕌', '🤲', '🌙', '🌟', '✅', '❌',
+  '⏰', '📚', '📝', '💡', '🙂', '😴', '🥳', '😇'
+];
+
+function chEl_(id) { return document.getElementById(id); }
+
+/* ---------- التحديث الدوري الخفيف + الإشعارات ---------- */
+
+function startChatPolling_() {
+
+  chatEnsureBell_();
+
+  if (CHAT.pollTimer) return;
+
+  chatPollOnce_();
+
+  CHAT.pollTimer = setInterval(function() {
+    if (document.hidden || !SESSION_TOKEN) return;
+    chatPollOnce_();
+  }, 20000);
+
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden && SESSION_TOKEN) chatPollOnce_();
+  });
+}
+
+function chatEnsureBell_() {
+
+  if (chEl_('chatBell')) return;
+
+  const bell = document.createElement('div');
+  bell.id = 'chatBell';
+  bell.className = 'ch-bell';
+  bell.title = 'المحادثات';
+  bell.innerHTML = '💬<span class="ch-bell-badge" id="chatBellBadge"></span>';
+  bell.onclick = function() { chatGoto_(null); };
+  document.body.appendChild(bell);
+
+  const toast = document.createElement('div');
+  toast.id = 'chatToast';
+  toast.className = 'ch-toast';
+  document.body.appendChild(toast);
+}
+
+function chatGoto_(openKey) {
+  CHAT.openKey = openKey || null;
+  const item = document.querySelector('.menu-item[onclick^="showChat"]');
+  if (item) showChat(item);
+  const toast = chEl_('chatToast');
+  if (toast) toast.classList.remove('show');
+}
+
+function chatSetBadge_(n) {
+
+  const bell = chEl_('chatBell');
+  const bellBadge = chEl_('chatBellBadge');
+  const menuBadge = chEl_('chatMenuBadge');
+
+  if (bell) bell.style.display = SESSION_TOKEN ? 'flex' : 'none';
+
+  [bellBadge, menuBadge].forEach(function(b) {
+    if (!b) return;
+    b.textContent = n > 99 ? '99+' : String(n);
+    b.style.display = n > 0 ? 'block' : 'none';
+  });
+}
+
+function chatToast_(latest) {
+
+  const toast = chEl_('chatToast');
+  const bell = chEl_('chatBell');
+  if (!toast) return;
+
+  toast.innerHTML =
+    '<div class="ch-toast-ico">💬</div>' +
+    '<div class="ch-toast-body">' +
+      '<div class="ch-toast-title">رسالة جديدة من ' +
+        escapeHtml(latest.fromName || 'مستخدم') + '</div>' +
+      '<div class="ch-toast-text">' + escapeHtml(latest.text || '') + '</div>' +
+    '</div>';
+
+  toast.onclick = function() { chatGoto_(latest.from); };
+  toast.classList.add('show');
+
+  if (bell) {
+    bell.classList.remove('ch-ring');
+    void bell.offsetWidth;
+    bell.classList.add('ch-ring');
+  }
+
+  clearTimeout(chatToast_.t);
+  chatToast_.t = setTimeout(function() {
+    toast.classList.remove('show');
+  }, 7000);
+}
+
+function chatPollOnce_() {
+
+  if (!SESSION_TOKEN || CHAT.busy) return;
+
+  // لو تغيّر المستخدم (تسجيل خروج ودخول بحساب آخر) نصفّر الحالة
+  const uk = CURRENT_USER
+    ? [CURRENT_USER.role, CURRENT_USER.linkedId, CURRENT_USER.username].join(':')
+    : '';
+
+  if (CHAT.userKey !== uk) {
+    CHAT.userKey = uk;
+    CHAT.ver = null;
+    CHAT.unread = 0;
+    CHAT.active = null;
+    CHAT.contacts = [];
+    chatSetBadge_(0);
+  }
+
+  CHAT.busy = true;
+
+  server
+    .withSuccessHandler(function(res) {
+
+      CHAT.busy = false;
+      chatSetBadge_(CHAT.unread);   // يُظهر الجرس بعد تسجيل الدخول
+
+      if (!res || !res.changed) return;
+
+      CHAT.ver = res.ver;
+
+      const prev = CHAT.unread;
+      CHAT.unread = res.unread || 0;
+      chatSetBadge_(CHAT.unread);
+
+      if (chEl_('chatRoot')) {
+        chatRefresh_();
+      } else if (CHAT.unread > prev && res.latest) {
+        chatToast_(res.latest);
+      }
+    })
+    .withFailureHandler(function() {
+      CHAT.busy = false;
+    })
+    .chatPoll(CHAT.ver);
+}
+
+/* ---------- الصفحة ---------- */
+
+function showChat(element) {
+
+  setCurrentPage('chat');
+  activateMenu(element);
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="page-title">💬 المحادثات</div>
+
+    <div class="ch-notice">
+      🕒 للحفاظ على سرعة النظام، تُحذف رسائل المحادثات تلقائيًا بعد 7 أيام.
+      احتفظ بأي معلومة مهمة خارج الشات.
+    </div>
+
+    <div class="ch-app" id="chatRoot">
+
+      <aside class="ch-side">
+        <div class="ch-side-head">
+          <div class="ch-me" id="chMe"></div>
+          <input class="ch-search" id="chSearch"
+                 placeholder="🔍 ابحث عن اسم..."
+                 oninput="chatSetSearch_(this.value)">
+          <div class="ch-tabs" id="chTabs" style="display:none;"></div>
+        </div>
+        <div class="ch-list" id="chList">
+          <div class="ch-noresult">جاري التحميل...</div>
+        </div>
+      </aside>
+
+      <section class="ch-main" id="chMain">
+        ${chatEmptyHtml_()}
+      </section>
+
+    </div>
+  `;
+
+  CHAT.active = null;
+  CHAT.messages = [];
+
+  chatLoadContacts_(function() {
+    if (CHAT.openKey) {
+      chatOpen_(CHAT.openKey);
+      CHAT.openKey = null;
+    }
+  });
+}
+
+function chatEmptyHtml_() {
+  return `
+    <div class="ch-empty">
+      <div class="ch-empty-ico">💬</div>
+      <h3>مرحبًا بك في المحادثات</h3>
+      <div>اختر محادثة من القائمة لبدء المراسلة</div>
+    </div>
+  `;
+}
+
+/* ---------- جهات الاتصال ---------- */
+
+function chatLoadContacts_(callback) {
+
+  server
+    .withSuccessHandler(function(res) {
+
+      CHAT.me = res.me;
+      CHAT.myName = res.myName;
+      CHAT.role = res.role;
+      CHAT.contacts = res.contacts || [];
+      CHAT.ver = res.ver;
+      CHAT.unread = res.unread || 0;
+      chatSetBadge_(CHAT.unread);
+
+      if (chEl_('chatRoot')) {
+
+        const me = chEl_('chMe');
+        if (me) me.textContent = '👤 ' + (CHAT.myName || '');
+
+        const tabs = chEl_('chTabs');
+        if (tabs) {
+          if (CHAT.role === 'admin') {
+            tabs.style.display = 'flex';
+            chatRenderTabs_();
+          } else {
+            tabs.style.display = 'none';
+          }
+        }
+
+        chatRenderList_();
+      }
+
+      if (callback) callback();
+    })
+    .withFailureHandler(function(error) {
+      const list = chEl_('chList');
+      if (list) {
+        list.innerHTML =
+          '<div class="ch-noresult">تعذر تحميل المحادثات: ' +
+          escapeHtml(String(error.message || error)) + '</div>';
+      }
+    })
+    .getChatContacts();
+}
+
+function chatRenderTabs_() {
+
+  const tabs = chEl_('chTabs');
+  if (!tabs) return;
+
+  const defs = [['all', 'الكل'], ['student', 'الطلاب'], ['teacher', 'المدرسون']];
+
+  tabs.innerHTML = defs.map(function(d) {
+    return '<div class="ch-tab' + (CHAT.filter === d[0] ? ' active' : '') +
+      '" onclick="chatSetFilter_(\'' + d[0] + '\')">' + d[1] + '</div>';
+  }).join('');
+}
+
+function chatSetFilter_(f) {
+  CHAT.filter = f;
+  chatRenderTabs_();
+  chatRenderList_();
+}
+
+function chatSetSearch_(v) {
+  CHAT.search = String(v || '').trim().toLowerCase();
+  chatRenderList_();
+}
+
+function chatRoleLabel_(role) {
+  return role === 'admin' ? 'الإدارة' : (role === 'teacher' ? 'مدرس' : 'طالب');
+}
+
+function chatAvatarHtml_(c, size) {
+  const letter = String(c.name || '؟').trim().charAt(0) || '؟';
+  const style = size ? ' style="width:' + size + 'px;height:' + size + 'px;"' : '';
+  return '<div class="ch-avatar ch-av-' + c.role + '"' + style + '>' +
+    escapeHtml(letter) + '</div>';
+}
+
+function chatTimeShort_(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  const now = new Date();
+  if (d.toDateString() === now.toDateString()) {
+    return d.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+  }
+  return d.toLocaleDateString('ar-EG', { day: 'numeric', month: 'short' });
+}
+
+function chatRenderList_() {
+
+  const list = chEl_('chList');
+  if (!list) return;
+
+  let items = CHAT.contacts.filter(function(c) {
+    if (CHAT.filter !== 'all' && c.role !== CHAT.filter) return false;
+    if (CHAT.search && String(c.name).toLowerCase().indexOf(CHAT.search) === -1) return false;
+    return true;
+  });
+
+  items.sort(function(a, b) {
+    if ((b.lastTs || 0) !== (a.lastTs || 0)) return (b.lastTs || 0) - (a.lastTs || 0);
+    return String(a.name).localeCompare(String(b.name), 'ar');
+  });
+
+  if (!items.length) {
+    list.innerHTML = '<div class="ch-noresult">لا توجد جهات اتصال</div>';
+    return;
+  }
+
+  list.innerHTML = items.map(function(c) {
+
+    const active = CHAT.active && CHAT.active.key === c.key;
+
+    const last = c.lastText
+      ? (c.lastMine ? 'أنت: ' : '') + c.lastText
+      : 'لا توجد رسائل بعد';
+
+    return `
+      <div class="ch-item${active ? ' active' : ''}"
+           data-key="${escapeHtml(c.key)}"
+           onclick="chatOpen_(this.dataset.key)">
+
+        ${chatAvatarHtml_(c)}
+
+        <div class="ch-item-body">
+          <div class="ch-item-top">
+            <div class="ch-item-name">
+              ${escapeHtml(c.name)}
+              <span class="ch-role-chip">${chatRoleLabel_(c.role)}</span>
+            </div>
+            <div class="ch-item-time">${escapeHtml(chatTimeShort_(c.lastTs))}</div>
+          </div>
+          <div class="ch-item-bottom">
+            <div class="ch-item-last">${escapeHtml(last)}</div>
+            ${c.unread > 0
+              ? '<div class="ch-unread">' + c.unread + '</div>'
+              : ''}
+          </div>
+        </div>
+
+      </div>
+    `;
+  }).join('');
+}
+
+/* ---------- المحادثة ---------- */
+
+function chatOpen_(key) {
+
+  const contact = CHAT.contacts.find(function(c) { return c.key === key; });
+  if (!contact) return;
+
+  CHAT.active = contact;
+  CHAT.messages = [];
+
+  const app = chEl_('chatRoot');
+  const main = chEl_('chMain');
+  if (!app || !main) return;
+
+  app.classList.add('ch-open');
+
+  main.innerHTML = `
+    <div class="ch-head">
+      <button type="button" class="ch-back" onclick="chatBack_()">➜</button>
+      ${chatAvatarHtml_(contact, 42)}
+      <div>
+        <div class="ch-head-name">${escapeHtml(contact.name)}</div>
+        <div class="ch-head-sub">${chatRoleLabel_(contact.role)}</div>
+      </div>
+    </div>
+
+    <div class="ch-msgs" id="chMsgs">
+      <div class="ch-nomsg">جاري التحميل...</div>
+    </div>
+
+    <div class="ch-composer">
+
+      <div class="ch-emoji-panel" id="chEmoji">
+        ${CHAT_EMOJIS.map(function(e) {
+          return '<span data-e="' + e + '" onclick="chatInsertEmoji_(this.dataset.e)">' + e + '</span>';
+        }).join('')}
+      </div>
+
+      <button type="button" class="ch-btn-round ch-btn-emoji"
+              title="إيموجي" onclick="chatToggleEmoji_()">😊</button>
+
+      <textarea class="ch-input" id="chInput" rows="1" maxlength="1000"
+                placeholder="اكتب رسالة..."
+                oninput="chatAutoGrow_(this)"
+                onkeydown="chatKeyDown_(event)"></textarea>
+
+      <button type="button" class="ch-btn-round ch-btn-send"
+              title="إرسال" onclick="chatSend_()">➤</button>
+
+    </div>
+  `;
+
+  chatRenderList_();
+  chatLoadMessages_(true);
+
+  const input = chEl_('chInput');
+  if (input && !('ontouchstart' in window)) input.focus();
+}
+
+function chatBack_() {
+  const app = chEl_('chatRoot');
+  if (app) app.classList.remove('ch-open');
+  CHAT.active = null;
+  chatRenderList_();
+}
+
+function chatLoadMessages_(forceBottom) {
+
+  if (!CHAT.active) return;
+  const key = CHAT.active.key;
+
+  server
+    .withSuccessHandler(function(res) {
+
+      if (!CHAT.active || CHAT.active.key !== key) return;
+
+      // نحتفظ بالرسائل اللي لسه بتتبعت
+      const local = CHAT.messages.filter(function(m) {
+        return m.pending || m.failed;
+      });
+
+      CHAT.messages = (res.messages || []).concat(local);
+      chatRenderMessages_(forceBottom);
+    })
+    .withFailureHandler(function(error) {
+      const box = chEl_('chMsgs');
+      if (box) {
+        box.innerHTML =
+          '<div class="ch-nomsg">تعذر تحميل الرسائل: ' +
+          escapeHtml(String(error.message || error)) + '</div>';
+      }
+    })
+    .getChatMessages(key);
+}
+
+function chatRefresh_() {
+  chatLoadContacts_();
+  if (CHAT.active) chatLoadMessages_(false);
+}
+
+function chatDayLabel_(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const y = new Date();
+  y.setDate(now.getDate() - 1);
+
+  if (d.toDateString() === now.toDateString()) return 'اليوم';
+  if (d.toDateString() === y.toDateString()) return 'أمس';
+
+  return d.toLocaleDateString('ar-EG', { weekday: 'long', day: 'numeric', month: 'long' });
+}
+
+function chatFormatText_(text) {
+  return escapeHtml(text).replace(/\n/g, '<br>');
+}
+
+function chatRenderMessages_(forceBottom) {
+
+  const box = chEl_('chMsgs');
+  if (!box) return;
+
+  const nearBottom =
+    box.scrollHeight - box.scrollTop - box.clientHeight < 90;
+
+  if (!CHAT.messages.length) {
+    box.innerHTML = '<div class="ch-nomsg">ابدأ المحادثة بإرسال رسالة 👋</div>';
+    return;
+  }
+
+  let html = '';
+  let lastDay = '';
+
+  CHAT.messages.forEach(function(m) {
+
+    const day = chatDayLabel_(m.ts);
+    if (day !== lastDay) {
+      html += '<div class="ch-day"><span>' + escapeHtml(day) + '</span></div>';
+      lastDay = day;
+    }
+
+    const time = new Date(m.ts).toLocaleTimeString(
+      'ar-EG', { hour: '2-digit', minute: '2-digit' }
+    );
+
+    let tick = '';
+    if (m.mine) {
+      tick = m.pending ? '🕓' : (m.failed ? '⚠️' : (m.read ? '✓✓' : '✓'));
+    }
+
+    html +=
+      '<div class="ch-row ' + (m.mine ? 'ch-mine' : 'ch-theirs') + '">' +
+        '<div class="ch-bubble' + (m.pending ? ' ch-pending' : '') +
+          (m.failed ? ' ch-failed' : '') + '">' +
+          chatFormatText_(m.text) +
+          '<div class="ch-meta"><span>' + escapeHtml(time) + '</span>' +
+            (m.mine
+              ? '<span class="ch-tick' + (m.read ? ' ch-read' : '') + '">' + tick + '</span>'
+              : '') +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  });
+
+  box.innerHTML = html;
+
+  if (forceBottom || nearBottom) {
+    box.scrollTop = box.scrollHeight;
+  }
+}
+
+/* ---------- الإرسال والإيموجي ---------- */
+
+function chatAutoGrow_(ta) {
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 120) + 'px';
+}
+
+function chatKeyDown_(e) {
+  // الكمبيوتر: Enter يرسل و Shift+Enter سطر جديد | الموبايل: Enter سطر جديد
+  if (e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)) {
+    e.preventDefault();
+    chatSend_();
+  }
+}
+
+function chatToggleEmoji_() {
+  const p = chEl_('chEmoji');
+  if (p) p.classList.toggle('show');
+}
+
+function chatInsertEmoji_(emoji) {
+  const ta = chEl_('chInput');
+  if (!ta) return;
+  const s = ta.selectionStart;
+  const e = ta.selectionEnd;
+  ta.value = ta.value.slice(0, s) + emoji + ta.value.slice(e);
+  ta.focus();
+  ta.selectionStart = ta.selectionEnd = s + emoji.length;
+  chatAutoGrow_(ta);
+}
+
+function chatSend_() {
+
+  if (!CHAT.active) return;
+
+  const ta = chEl_('chInput');
+  if (!ta) return;
+
+  const text = ta.value.trim();
+  if (!text) return;
+
+  ta.value = '';
+  chatAutoGrow_(ta);
+
+  const panel = chEl_('chEmoji');
+  if (panel) panel.classList.remove('show');
+
+  const key = CHAT.active.key;
+
+  const temp = {
+    id: 'tmp' + Date.now(),
+    mine: true,
+    text: text,
+    ts: Date.now(),
+    pending: true
+  };
+
+  CHAT.messages.push(temp);
+  chatRenderMessages_(true);
+
+  server
+    .withSuccessHandler(function() {
+      CHAT.messages = CHAT.messages.filter(function(m) { return m !== temp; });
+      if (CHAT.active && CHAT.active.key === key) chatLoadMessages_(true);
+      chatLoadContacts_();
+    })
+    .withFailureHandler(function(error) {
+      temp.pending = false;
+      temp.failed = true;
+      chatRenderMessages_(false);
+      alert('تعذر إرسال الرسالة:\n' + (error.message || error));
+    })
+    .sendChatMessage(key, text);
+}
+
+// إغلاق لوحة الإيموجي عند الضغط خارجها
+document.addEventListener('click', function(e) {
+  const panel = chEl_('chEmoji');
+  if (!panel || !panel.classList.contains('show')) return;
+  if (panel.contains(e.target)) return;
+  if (e.target.classList && e.target.classList.contains('ch-btn-emoji')) return;
+  panel.classList.remove('show');
+});
 
 
 
@@ -10254,7 +11462,7 @@ function formatLessonTime(value) {
       var status = String(lesson.status || '').trim();
 
       if (status === STATUS_EXCUSED) {
-        styleStatus_(tr, 'الطالب إعتذر عن الحصة', BADGE_YELLOW);
+        styleStatus_(tr, 'تم إلغاء الحصة', BADGE_YELLOW);
 
         if (isAdmin_()) {
           actionCell.innerHTML = '';
@@ -10285,7 +11493,16 @@ function formatLessonTime(value) {
       .withFailureHandler(function (err) {
         console.error('getLessonFlags:', err);
       })
-      .getLessonFlags();
+      .getLessonFlagsForRange(
+        (function () {
+          var d = document.getElementById('lessonDateFilter');
+          return d && d.value ? d.value : getTodayString();
+        })(),
+        (function () {
+          var d = document.getElementById('lessonDateFilter');
+          return d && d.value ? d.value : getTodayString();
+        })()
+      );
   }
 
   function applyFlags_(flags) {
@@ -10405,8 +11622,8 @@ function formatLessonTime(value) {
     ));
 
     box.appendChild(optionButton_(
-      'الطالب إعتذر عن الحصة',
-      'أبلغ قبل الحصة بأكثر من ساعة — لا تُحسب منفذة ولا تدخل في الراتب',
+      'تم إلغاء الحصة',
+      'الطالب أو المعلم اعتذر قبل ساعة أو أكثر — لا تُحسب منفذة ولا تدخل في الراتب',
       '#d4a017',
       function () { markExcused_(lesson.id); }
     ));
@@ -10463,7 +11680,7 @@ function formatLessonTime(value) {
 
   function markExcused_(lessonId) {
     if (!confirm(
-      'تأكيد: الطالب إعتذر عن الحصة؟\n\n' +
+      'تأكيد: تم إلغاء الحصة؟\n\n' +
       '• لن تُحسب منفذة\n' +
       '• لن تُضاف لراتب المعلم'
     )) return;
@@ -10509,7 +11726,7 @@ function formatLessonTime(value) {
     var actions = document.createElement('div');
     actions.setAttribute('style', 'display:flex;gap:10px;');
 
-    actions.appendChild(makeButton_('💾 حفظ الموعد', 'btn btn-primary', function () {
+    actions.appendChild(makeButton_('حفظ الموعد', 'btn btn-primary', function () {
       var d = document.getElementById('laDate').value;
       var t = document.getElementById('laTime').value;
 
@@ -10968,7 +12185,7 @@ document.addEventListener(
     var style = 'background:#eee;color:#555;', text = t.status || 'لم تبدأ';
  
     if (t.attendance === 'لم يحضر') { style = 'background:#f8d7da;color:#b02a37;'; text = 'الطالب لم يحضر'; }
-    else if (t.status === 'اعتذر الطالب') { style = 'background:#fff3cd;color:#8a6d0b;'; text = 'الطالب إعتذر عن الحصة'; }
+    else if (t.status === 'اعتذر الطالب') { style = 'background:#fff3cd;color:#8a6d0b;'; text = 'تم إلغاء الحصة'; }
     else if (t.status === 'مكتملة') style = 'background:#e7f5ec;color:#1f6b3f;';
     else if (t.status === 'جارية') style = 'background:#e3f2fd;color:#1565c0;';
     else if (t.status === 'بانتظار التقرير') style = 'background:#ffe9cc;color:#a65a00;';
@@ -11253,34 +12470,64 @@ document.addEventListener(
  
   function loadSchedule_() {
     if (!el_('schedRoot')) return;
- 
+
+    var startDate = dateKey_(SCH.weekStart);
+    var endDateObj = new Date(SCH.weekStart);
+    endDateObj.setDate(endDateObj.getDate() + 6);
+    var endDate = dateKey_(endDateObj);
+
+    SCH.loading = true;
+    var pending = 2;
+    var lessonError = null;
+    var flagsError = null;
+
+    function finish_() {
+      pending--;
+      if (pending > 0 || !el_('schedRoot')) return;
+
+      SCH.loading = false;
+      var n = new Date(wallNow_());
+      SCH.updatedAt = pad2_(n.getUTCHours()) + ':' + pad2_(n.getUTCMinutes());
+
+      if (lessonError && !SCH.lessons.length) {
+        var box = el_('schScroll');
+        if (box) {
+          box.innerHTML = '<div class="sch-empty" style="color:#b42318;">تعذر تحميل الجدول: ' +
+            escapeHtml(lessonError && lessonError.message ? lessonError.message : String(lessonError)) +
+            '</div>';
+        }
+        return;
+      }
+
+      if (flagsError) SCH.flags = {};
+      fillTeacherSelect_();
+      renderSchedule_();
+    }
+
+    /* الطلبان مستقلان، لذلك نرسلهما بالتوازي بدل الانتظار التسلسلي */
     server
       .withSuccessHandler(function (lessons) {
-        if (!el_('schedRoot')) return;
-        SCH.lessons = lessons || [];
- 
-        server
-          .withSuccessHandler(function (flags) { SCH.flags = flags || {}; finish_(); })
-          .withFailureHandler(function () { SCH.flags = {}; finish_(); })
-          .getLessonFlags();
- 
-        function finish_() {
-          var n = new Date(wallNow_());
-          SCH.updatedAt = pad2_(n.getUTCHours()) + ':' + pad2_(n.getUTCMinutes());
-          fillTeacherSelect_();
-          renderSchedule_();
-        }
+        if (el_('schedRoot')) SCH.lessons = lessons || [];
+        finish_();
       })
       .withFailureHandler(function (err) {
-        var box = el_('schScroll');
-        if (box && !SCH.lessons.length) {
-          box.innerHTML = '<div class="sch-empty" style="color:#b42318;">تعذر تحميل الجدول: ' +
-            escapeHtml(err && err.message ? err.message : String(err)) + '</div>';
-        }
+        lessonError = err;
+        finish_();
       })
-      .getLessons();
+      .getLessonsForRange(startDate, endDate);
+
+    server
+      .withSuccessHandler(function (flags) {
+        if (el_('schedRoot')) SCH.flags = flags || {};
+        finish_();
+      })
+      .withFailureHandler(function (err) {
+        flagsError = err;
+        finish_();
+      })
+      .getLessonFlagsForRange(startDate, endDate);
   }
- 
+
   function fillTeacherSelect_() {
     var sel = el_('schTeacher');
     if (!sel) return;
@@ -11550,6 +12797,387 @@ document.addEventListener(
   };
  
 })();
+
+/* ===================================================================
+   قوالب التقارير حسب البرنامج
+=================================================================== */
+
+let REPORT_TEMPLATES_CACHE = null;
+
+const REPORT_LEGACY_KEYS = ['summary', 'level', 'memorization', 'homework', 'notes'];
+
+const REPORT_LEGACY_LABELS = {
+  summary: 'ملخص الحصة',
+  level: 'مستوى الطالب',
+  memorization: 'مقدار الحفظ',
+  homework: 'الواجب',
+  notes: 'ملاحظات'
+};
+
+const RT_PROGRAMS = [
+  'حفظ القرآن',
+  'العلوم الشرعية',
+  'البرنامج المتكامل',
+  'افتراضي'
+];
+
+function loadReportTemplates_(callback, force) {
+
+  if (REPORT_TEMPLATES_CACHE && !force) {
+    callback(REPORT_TEMPLATES_CACHE);
+    return;
+  }
+
+  server
+    .withSuccessHandler(function(templates) {
+      REPORT_TEMPLATES_CACHE = templates || {};
+      callback(REPORT_TEMPLATES_CACHE);
+    })
+    .withFailureHandler(function() {
+      REPORT_TEMPLATES_CACHE = REPORT_TEMPLATES_CACHE || {};
+      callback(REPORT_TEMPLATES_CACHE);
+    })
+    .getReportTemplates();
+}
+
+function templateForProgram_(templates, program) {
+  return (
+    templates[String(program || '').trim()] ||
+    templates['افتراضي'] ||
+    []
+  );
+}
+
+/**
+ * الحقول التي تُعرض لتقرير معيّن: [{key,label,type,value}]
+ * - حسب قالب برنامج التقرير
+ * - + أي بيانات قديمة أو حقول اتحذفت من القالب (ما نضيّعش التاريخ)
+ */
+function reportDisplayFields_(report, templates) {
+
+  const tpl = templateForProgram_(templates || {}, report.program || '');
+
+  const extraMap = {};
+  (report.extra || []).forEach(function(e) {
+    extraMap[e.key] = e;
+  });
+
+  const out = [];
+  const used = {};
+
+  tpl.forEach(function(f) {
+
+    let value = '';
+
+    if (REPORT_LEGACY_KEYS.indexOf(f.key) !== -1) {
+      value = report[f.key];
+    } else if (extraMap[f.key]) {
+      value = extraMap[f.key].value;
+    }
+
+    used[f.key] = true;
+
+    out.push({
+      key: f.key,
+      label: f.label,
+      type: f.type,
+      value: (value === undefined || value === null) ? '' : value
+    });
+  });
+
+  REPORT_LEGACY_KEYS.forEach(function(k) {
+    if (!used[k] && report[k] && String(report[k]).trim() !== '') {
+      out.push({
+        key: k,
+        label: REPORT_LEGACY_LABELS[k],
+        type: 'textarea',
+        value: report[k]
+      });
+    }
+  });
+
+  (report.extra || []).forEach(function(e) {
+    if (!used[e.key]) {
+      out.push({
+        key: e.key,
+        label: e.label,
+        type: 'textarea',
+        value: e.value
+      });
+    }
+  });
+
+  return out;
+}
+
+/* ---------- صفحة الأدمن: تعديل قوالب التقارير ---------- */
+
+let RT_STATE = { program: 'حفظ القرآن', fields: [] };
+
+function showReportTemplates(element) {
+
+  setCurrentPage('reporttemplates');
+  activateMenu(element);
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="page-title">🧩 قوالب التقارير حسب البرنامج</div>
+
+    <div class="section">
+
+      <p style="color:#666;line-height:1.9;margin-bottom:15px;">
+        اختر البرنامج ثم عدّل الحقول التي تظهر للمدرس عند كتابة تقرير الحصة.
+        يُستخدم القالب تلقائيًا حسب البرنامج المسجّل في بيانات الطالب.
+        قالب «افتراضي» يُستخدم للطلاب الذين ليس لهم برنامج محدد.
+        تعديل القالب لا يغيّر التقارير المكتوبة سابقًا.
+      </p>
+
+      <div id="rtTabs"
+           style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;">
+      </div>
+
+      <div id="rtEditor">
+        <div class="loading">جاري التحميل...</div>
+      </div>
+
+    </div>
+  `;
+
+  loadReportTemplates_(function() {
+    rtSelectProgram_(RT_STATE.program);
+  }, true);
+}
+
+function rtSelectProgram_(program) {
+
+  RT_STATE.program = program;
+
+  const source = templateForProgram_(
+    REPORT_TEMPLATES_CACHE || {},
+    program
+  );
+
+  RT_STATE.fields = JSON.parse(JSON.stringify(source));
+
+  rtRenderTabs_();
+  rtRender_();
+}
+
+function rtRenderTabs_() {
+
+  const box = document.getElementById('rtTabs');
+  if (!box) return;
+
+  box.innerHTML = RT_PROGRAMS.map(function(p) {
+    const active = (p === RT_STATE.program);
+    return (
+      '<button type="button" class="btn ' +
+      (active ? 'btn-primary' : 'btn-secondary') + '" ' +
+      'onclick="rtSelectProgram_(\'' + p + '\')">' +
+      escapeHtml(p) + '</button>'
+    );
+  }).join('');
+}
+
+function rtRender_() {
+
+  const box = document.getElementById('rtEditor');
+  if (!box) return;
+
+  const typeOptions = [
+    ['text', 'نص قصير'],
+    ['textarea', 'نص طويل'],
+    ['select', 'قائمة منسدلة']
+  ];
+
+  const rows = RT_STATE.fields.map(function(f, i) {
+
+    return `
+      <div style="
+        border:1px solid #e5e5e5;
+        border-radius:12px;
+        padding:14px;
+        margin-bottom:12px;
+        background:#fff;
+      ">
+
+        <div style="
+          display:grid;
+          grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+          gap:10px;
+        ">
+
+          <div class="form-group">
+            <label>عنوان الحقل</label>
+            <input type="text"
+                   value="${escapeHtml(f.label || '')}"
+                   oninput="RT_STATE.fields[${i}].label = this.value">
+          </div>
+
+          <div class="form-group">
+            <label>نوع الحقل</label>
+            <select onchange="rtSetType_(${i}, this.value)">
+              ${typeOptions.map(function(o) {
+                return '<option value="' + o[0] + '"' +
+                  (f.type === o[0] ? ' selected' : '') + '>' +
+                  o[1] + '</option>';
+              }).join('')}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>نص إرشادي (اختياري)</label>
+            <input type="text"
+                   value="${escapeHtml(f.placeholder || '')}"
+                   oninput="RT_STATE.fields[${i}].placeholder = this.value">
+          </div>
+
+        </div>
+
+        ${f.type === 'select' ? `
+          <div class="form-group" style="margin-top:10px;">
+            <label>الخيارات (خيار في كل سطر)</label>
+            <textarea rows="4"
+                      oninput="rtSetOptions_(${i}, this.value)">${escapeHtml((f.options || []).join('\n'))}</textarea>
+          </div>
+        ` : ''}
+
+        <div style="
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          flex-wrap:wrap;
+          gap:10px;
+          margin-top:10px;
+        ">
+
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+            <input type="checkbox"
+                   ${f.required ? 'checked' : ''}
+                   onchange="RT_STATE.fields[${i}].required = this.checked">
+            حقل مطلوب
+          </label>
+
+          <div style="display:flex;gap:6px;">
+            <button type="button" class="btn btn-secondary"
+                    ${i === 0 ? 'disabled' : ''}
+                    onclick="rtMove_(${i}, -1)">▲</button>
+            <button type="button" class="btn btn-secondary"
+                    ${i === RT_STATE.fields.length - 1 ? 'disabled' : ''}
+                    onclick="rtMove_(${i}, 1)">▼</button>
+            <button type="button" class="btn btn-secondary"
+                    onclick="rtRemove_(${i})">🗑️ حذف</button>
+          </div>
+
+        </div>
+
+      </div>
+    `;
+  }).join('');
+
+  box.innerHTML = `
+    ${rows || '<div class="empty">لا توجد حقول. أضف حقلًا جديدًا.</div>'}
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;">
+
+      <button type="button" class="btn btn-secondary"
+              onclick="rtAdd_()">
+        ➕ إضافة حقل
+      </button>
+
+      <button type="button" class="btn btn-primary" id="rtSaveBtn"
+              onclick="rtSave_()">
+        💾 حفظ القالب
+      </button>
+
+      <button type="button" class="btn btn-secondary"
+              onclick="rtReset_()">
+        ↩️ الرجوع للقالب الافتراضي
+      </button>
+
+    </div>
+  `;
+}
+
+function rtSetType_(i, type) {
+  RT_STATE.fields[i].type = type;
+  if (type === 'select' && !(RT_STATE.fields[i].options || []).length) {
+    RT_STATE.fields[i].options = ['ممتاز', 'جيد', 'ضعيف'];
+  }
+  rtRender_();
+}
+
+function rtSetOptions_(i, text) {
+  RT_STATE.fields[i].options = String(text || '')
+    .split('\n')
+    .map(function(s) { return s.trim(); })
+    .filter(Boolean);
+}
+
+function rtMove_(i, dir) {
+  const j = i + dir;
+  if (j < 0 || j >= RT_STATE.fields.length) return;
+  const tmp = RT_STATE.fields[i];
+  RT_STATE.fields[i] = RT_STATE.fields[j];
+  RT_STATE.fields[j] = tmp;
+  rtRender_();
+}
+
+function rtRemove_(i) {
+  if (!confirm('حذف هذا الحقل من القالب؟\n(التقارير القديمة تحتفظ ببياناتها)')) return;
+  RT_STATE.fields.splice(i, 1);
+  rtRender_();
+}
+
+function rtAdd_() {
+  RT_STATE.fields.push({
+    key: '',
+    label: '',
+    type: 'text',
+    options: [],
+    required: false,
+    placeholder: ''
+  });
+  rtRender_();
+}
+
+function rtSave_() {
+
+  const btn = document.getElementById('rtSaveBtn');
+  if (btn) btn.disabled = true;
+
+  server
+    .withSuccessHandler(function(res) {
+      alert(res.message || 'تم الحفظ');
+      loadReportTemplates_(function() {
+        rtSelectProgram_(RT_STATE.program);
+      }, true);
+    })
+    .withFailureHandler(function(error) {
+      if (btn) btn.disabled = false;
+      alert('تعذر حفظ القالب:\n' + (error.message || error));
+    })
+    .saveReportTemplate(RT_STATE.program, RT_STATE.fields);
+}
+
+function rtReset_() {
+
+  if (!confirm(
+    'الرجوع للقالب الافتراضي لبرنامج «' + RT_STATE.program + '»؟\n' +
+    'سيتم حذف تعديلاتك على هذا البرنامج.'
+  )) return;
+
+  server
+    .withSuccessHandler(function() {
+      loadReportTemplates_(function() {
+        rtSelectProgram_(RT_STATE.program);
+      }, true);
+    })
+    .withFailureHandler(function(error) {
+      alert('حدث خطأ:\n' + (error.message || error));
+    })
+    .resetReportTemplate(RT_STATE.program);
+}
+
 </script>
  
 
