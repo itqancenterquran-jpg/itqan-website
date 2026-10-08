@@ -614,6 +614,8 @@ function getStudentReports_(studentId) {
   const colHomework = headers.indexOf('الواجب');
   const colNotes = headers.indexOf('ملاحظات');
   const colCreatedAt = headers.indexOf('وقت إنشاء التقرير');
+  const colProgram = headers.indexOf('البرنامج');
+  const colExtra = headers.indexOf('بيانات إضافية');
 
 
   const reports = [];
@@ -693,7 +695,17 @@ function getStudentReports_(studentId) {
       createdAt:
         colCreatedAt !== -1
           ? formatDateForClient(row[colCreatedAt])
-          : ''
+          : '',
+
+      program:
+        colProgram !== -1
+          ? String(row[colProgram] || '').trim()
+          : '',
+
+      extra:
+        colExtra !== -1
+          ? parseReportExtra_(row[colExtra])
+          : []
 
     });
 
@@ -4120,7 +4132,13 @@ function getReportById_(reportId) {
     return null;
   }
 
-  const data = sheet.getRange(2, 1, lastRow - 1, 11).getValues();
+  const lastCol = Math.max(sheet.getLastColumn(), 11);
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0]
+    .map(function(h) { return String(h).trim(); });
+  const cProgram = headers.indexOf('البرنامج');
+  const cExtra = headers.indexOf('بيانات إضافية');
+
+  const data = sheet.getRange(2, 1, lastRow - 1, lastCol).getValues();
 
   for (let i = 0; i < data.length; i++) {
     if (String(data[i][0]) === String(reportId)) {
@@ -4135,7 +4153,9 @@ function getReportById_(reportId) {
         memorization: data[i][7],
         homework: data[i][8],
         notes: data[i][9],
-        createdAt: formatDateTime(data[i][10])
+        createdAt: formatDateTime(data[i][10]),
+        program: cProgram !== -1 ? String(data[i][cProgram] || '').trim() : '',
+        extra: cExtra !== -1 ? parseReportExtra_(data[i][cExtra]) : []
       };
     }
   }
@@ -4274,34 +4294,64 @@ function saveLessonReport_(lessonId, report) {
   );
 
   /*
+   * تحديد البرنامج من بيانات الطالب (من السيرفر مش من المتصفح)
+   * ثم التحقق من الحقول حسب قالب التقرير الخاص بهذا البرنامج
+   */
+  const program = getStudentProgram_(lesson.studentId);
+  const template = getTemplateForProgram_(program);
+
+  const values =
+    (report && report.values && typeof report.values === 'object')
+      ? report.values
+      : (report || {});
+
+  const legacy = { summary: '', level: '', memorization: '', homework: '', notes: '' };
+  const extra = [];
+
+  template.forEach(function(f) {
+    let v = values[f.key];
+    v = (v === undefined || v === null) ? '' : String(v).trim();
+    if (v.length > 5000) v = v.slice(0, 5000);
+
+    if (f.required && !v) {
+      throw new Error('الحقل "' + f.label + '" مطلوب');
+    }
+    if (f.type === 'select' && v && f.options.indexOf(v) === -1) {
+      throw new Error('قيمة غير صالحة في الحقل "' + f.label + '"');
+    }
+
+    if (REPORT_LEGACY_KEYS_.indexOf(f.key) !== -1) {
+      legacy[f.key] = v;
+    } else if (v) {
+      extra.push({ key: f.key, label: f.label, value: v });
+    }
+  });
+
+  /*
    * إضافة التقرير إلى ورقة التقارير
    *
-   * الترتيب:
-   * 1 رقم التقرير
-   * 2 تاريخ الحصة
-   * 3 رقم الطالب
-   * 4 اسم الطالب
-   * 5 المدرس
-   * 6 ملخص الحصة
-   * 7 مستوى الطالب
-   * 8 مقدار الحفظ
-   * 9 الواجب
-   * 10 ملاحظات
-   * 11 وقت إنشاء التقرير
+   * الأعمدة 1-11 كما هي (رقم التقرير ... وقت الإنشاء)
+   * ويُضاف عمودان: البرنامج + بيانات إضافية (JSON للحقول الخاصة بالبرنامج)
    */
-  reportsSheet.appendRow([
-    reportId,
-    lesson.date || new Date(),
-    lesson.studentId,
-    lesson.studentName,
-    lesson.teacherName,
-    report.summary || '',
-    report.level || '',
-    report.memorization || '',
-    report.homework || '',
-    report.notes || '',
-    createdAt
-  ]);
+  const cols = ensureReportsColumns_(reportsSheet);
+  const width = Math.max(reportsSheet.getLastColumn(), cols.program, cols.extra, 11);
+  const newRow = new Array(width).fill('');
+
+  newRow[0] = reportId;
+  newRow[1] = lesson.date || new Date();
+  newRow[2] = lesson.studentId;
+  newRow[3] = lesson.studentName;
+  newRow[4] = lesson.teacherName;
+  newRow[5] = safeReportCell_(legacy.summary);
+  newRow[6] = safeReportCell_(legacy.level);
+  newRow[7] = safeReportCell_(legacy.memorization);
+  newRow[8] = safeReportCell_(legacy.homework);
+  newRow[9] = safeReportCell_(legacy.notes);
+  newRow[10] = createdAt;
+  newRow[cols.program - 1] = program;
+  newRow[cols.extra - 1] = extra.length ? JSON.stringify(extra) : '';
+
+  reportsSheet.appendRow(newRow);
 
   /*
    * تحديث الحصة
@@ -8159,6 +8209,29 @@ function saveLessonReport(token, lessonId, report) {
   return saveLessonReport_(lessonId, report);
 }
 
+/* ---------- قوالب التقارير حسب البرنامج ---------- */
+
+// كل الأدوار تقرأ القوالب (لعرض التقارير)
+function getReportTemplates(token) {
+  requireAuth_(token, ['admin', 'teacher', 'student']);
+  return getReportTemplates_();
+}
+
+// نموذج التقرير الخاص بحصة معيّنة (حسب برنامج طالبها)
+function getLessonReportForm(token, lessonId) {
+  requireLessonAccess_(token, lessonId);
+  const studentId = getLessonStudentId_(lessonId);
+  const program = getStudentProgram_(studentId);
+  return {
+    program: program,
+    fields: getTemplateForProgram_(program)
+  };
+}
+
+// الأدمن فقط
+function saveReportTemplate()  { return runAdmin_(saveReportTemplate_, arguments); }
+function resetReportTemplate() { return runAdmin_(resetReportTemplate_, arguments); }
+
 /* =========================================================
    إدارة المستخدمين (للأدمن فقط)
 ========================================================= */
@@ -9182,4 +9255,721 @@ function adminGetLessonTimeline(token, lessonId) {
     actualMin: lessonTlMinutes_(start ? start.ms : null, end ? end.ms : null),
     reportDelayMin: lessonTlMinutes_(end ? end.ms : null, report ? report.ms : null)
   };
+}
+
+/* =========================================================
+   قوالب التقارير حسب البرنامج
+   ---------------------------------------------------------
+   - لكل برنامج (حفظ القرآن / العلوم الشرعية / البرنامج المتكامل)
+     قالب تقرير مختلف.
+   - الأدمن يعدّل القوالب من صفحة "قوالب التقارير".
+   - القوالب تُخزَّن في ورقة "قوالب التقارير" (تُنشأ تلقائيًا
+     عند أول حفظ). قبل ذلك تُستخدم القوالب الافتراضية أدناه.
+   - الحقول القياسية (summary, level, memorization, homework, notes)
+     تُحفظ في أعمدة التقرير القديمة، وأي حقل آخر يُحفظ في عمود
+     "بيانات إضافية" كـ JSON، فلا تتأثر التقارير القديمة.
+========================================================= */
+
+const REPORT_TEMPLATES_SHEET_ = 'قوالب التقارير';
+const REPORT_DEFAULT_PROGRAM_ = 'افتراضي';
+const REPORT_PROGRAMS_ = ['حفظ القرآن', 'العلوم الشرعية', 'البرنامج المتكامل'];
+const REPORT_LEGACY_KEYS_ = ['summary', 'level', 'memorization', 'homework', 'notes'];
+const REPORT_FIELD_TYPES_ = ['text', 'textarea', 'select'];
+const REPORT_LEVELS_ = ['ممتاز', 'جيد جدًا', 'جيد', 'يحتاج متابعة', 'يحتاج تحسين'];
+const REPORT_UNDERSTANDING_ = ['ممتاز', 'جيد', 'متوسط', 'ضعيف'];
+const REPORT_SUBJECTS_ = ['العقيدة', 'الفقه', 'السيرة النبوية', 'الحديث', 'التفسير', 'الآداب والسلوك', 'أخرى'];
+
+function rf_(key, label, type, opts) {
+  opts = opts || {};
+  return {
+    key: key,
+    label: label,
+    type: type,
+    options: opts.options || [],
+    required: !!opts.required,
+    placeholder: opts.placeholder || ''
+  };
+}
+
+function defaultReportTemplates_() {
+  const t = {};
+
+  t[REPORT_DEFAULT_PROGRAM_] = [
+    rf_('summary', 'ملخص الحصة', 'textarea', { required: true, placeholder: 'اكتب ملخصًا مختصرًا لما تم في الحصة...' }),
+    rf_('level', 'مستوى الطالب', 'select', { options: REPORT_LEVELS_ }),
+    rf_('memorization', 'مقدار الحفظ', 'text', { placeholder: 'مثال: حفظ 5 آيات' }),
+    rf_('homework', 'الواجب', 'textarea', { placeholder: 'اكتب المطلوب من الطالب للحصة القادمة...' }),
+    rf_('notes', 'ملاحظات', 'textarea', { placeholder: 'أي ملاحظات إضافية عن الطالب...' })
+  ];
+
+  t['حفظ القرآن'] = [
+    rf_('summary', 'ملخص الحصة', 'textarea', { required: true, placeholder: 'ما تم في الحصة باختصار...' }),
+    rf_('memorization', 'الحفظ الجديد', 'text', { placeholder: 'مثال: سورة البقرة من الآية 1 إلى 5' }),
+    rf_('revision', 'المراجعة', 'textarea', { placeholder: 'ما تمت مراجعته (قريب / بعيد) ومستوى الإتقان' }),
+    rf_('tajweed', 'التجويد والأخطاء', 'textarea', { placeholder: 'أحكام التجويد التي رُوجعت والأخطاء المتكررة' }),
+    rf_('level', 'مستوى الطالب', 'select', { options: REPORT_LEVELS_ }),
+    rf_('homework', 'الواجب (حفظ / مراجعة)', 'textarea', { placeholder: 'المطلوب حفظه ومراجعته للحصة القادمة' }),
+    rf_('notes', 'ملاحظات', 'textarea', { placeholder: 'أي ملاحظات إضافية...' })
+  ];
+
+  t['العلوم الشرعية'] = [
+    rf_('summary', 'ملخص الحصة', 'textarea', { required: true, placeholder: 'ما تم شرحه في الحصة باختصار...' }),
+    rf_('subject', 'المادة', 'select', { options: REPORT_SUBJECTS_ }),
+    rf_('topic', 'موضوع الدرس', 'text', { placeholder: 'عنوان الدرس / الباب' }),
+    rf_('understanding', 'مستوى الفهم والاستيعاب', 'select', { options: REPORT_UNDERSTANDING_ }),
+    rf_('level', 'مستوى الطالب', 'select', { options: REPORT_LEVELS_ }),
+    rf_('homework', 'الواجب', 'textarea', { placeholder: 'أسئلة / قراءة / تلخيص للحصة القادمة' }),
+    rf_('notes', 'ملاحظات', 'textarea', { placeholder: 'أي ملاحظات إضافية...' })
+  ];
+
+  t['البرنامج المتكامل'] = [
+    rf_('summary', 'ملخص الحصة', 'textarea', { required: true, placeholder: 'ما تم في الحصة باختصار...' }),
+    rf_('memorization', 'الحفظ والمراجعة (القرآن)', 'text', { placeholder: 'مثال: حفظ جديد 5 آيات + مراجعة جزء عمّ' }),
+    rf_('subject', 'المادة الشرعية', 'select', { options: REPORT_SUBJECTS_ }),
+    rf_('topic', 'موضوع الدرس', 'text', { placeholder: 'عنوان الدرس / الباب' }),
+    rf_('understanding', 'مستوى الفهم والاستيعاب', 'select', { options: REPORT_UNDERSTANDING_ }),
+    rf_('level', 'مستوى الطالب', 'select', { options: REPORT_LEVELS_ }),
+    rf_('homework', 'الواجب', 'textarea', { placeholder: 'المطلوب للحصة القادمة (حفظ + علوم شرعية)' }),
+    rf_('notes', 'ملاحظات', 'textarea', { placeholder: 'أي ملاحظات إضافية...' })
+  ];
+
+  return t;
+}
+
+// يمنع تحويل النص إلى معادلة داخل الشيت
+function safeReportCell_(v) {
+  const s = (v === undefined || v === null) ? '' : String(v);
+  return /^[=+\-@]/.test(s) ? "'" + s : s;
+}
+
+function parseReportExtra_(raw) {
+  if (!raw) return [];
+  try {
+    const arr = JSON.parse(String(raw));
+    if (!Array.isArray(arr)) return [];
+    return arr
+      .filter(function(e) { return e && e.key; })
+      .map(function(e) {
+        return {
+          key: String(e.key),
+          label: String(e.label || e.key),
+          value: String(e.value === undefined || e.value === null ? '' : e.value)
+        };
+      });
+  } catch (err) {
+    return [];
+  }
+}
+
+// القوالب = الافتراضية + أي قالب محفوظ في الشيت (يغطي على الافتراضي)
+function getReportTemplates_() {
+  const result = defaultReportTemplates_();
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    .getSheetByName(REPORT_TEMPLATES_SHEET_);
+  if (!sheet || sheet.getLastRow() < 2) return result;
+
+  const rows = sheet.getRange(2, 1, sheet.getLastRow() - 1, 8).getValues();
+  const custom = {};
+
+  rows.forEach(function(r) {
+    const program = String(r[0] || '').trim();
+    const key = String(r[1] || '').trim();
+    const label = String(r[2] || '').trim();
+    if (!program || !key || !label) return;
+
+    const type = REPORT_FIELD_TYPES_.indexOf(String(r[3])) !== -1 ? String(r[3]) : 'text';
+    const options = String(r[4] || '')
+      .split('|')
+      .map(function(s) { return s.trim(); })
+      .filter(Boolean);
+
+    if (!custom[program]) custom[program] = [];
+    custom[program].push({
+      order: Number(r[6]) || 0,
+      field: {
+        key: key,
+        label: label,
+        type: type,
+        options: type === 'select' ? options : [],
+        required: String(r[5] || '').trim() === 'نعم',
+        placeholder: String(r[7] || '')
+      }
+    });
+  });
+
+  Object.keys(custom).forEach(function(program) {
+    result[program] = custom[program]
+      .sort(function(a, b) { return a.order - b.order; })
+      .map(function(x) { return x.field; });
+  });
+
+  return result;
+}
+
+function getTemplateForProgram_(program) {
+  const templates = getReportTemplates_();
+  const p = String(program || '').trim();
+  return templates[p] || templates[REPORT_DEFAULT_PROGRAM_];
+}
+
+// برنامج الطالب (عمود E في ورقة الطلاب)
+function getStudentProgram_(studentId) {
+  const target = String(studentId || '').trim();
+  if (!target) return '';
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('الطلاب');
+  if (!sheet) return '';
+  const last = sheet.getLastRow();
+  if (last < 2) return '';
+  const rows = sheet.getRange(2, 1, last - 1, 5).getValues();
+  for (let i = 0; i < rows.length; i++) {
+    if (String(rows[i][0]).trim() === target) {
+      return String(rows[i][4] || '').trim();
+    }
+  }
+  return '';
+}
+
+// رقم الطالب المسجل على الحصة (عمود D)
+function getLessonStudentId_(lessonId) {
+  const target = String(lessonId || '').trim();
+  if (!target) return '';
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('الحصص');
+  if (!sheet) return '';
+  const last = sheet.getLastRow();
+  if (last < 2) return '';
+  const rows = sheet.getRange(2, 1, last - 1, 4).getValues();
+  for (let i = 0; i < rows.length; i++) {
+    if (String(rows[i][0]).trim() === target) {
+      return String(rows[i][3] || '').trim();
+    }
+  }
+  return '';
+}
+
+// يتأكد من وجود عمودي "البرنامج" و"بيانات إضافية" في ورقة التقارير
+function ensureReportsColumns_(sheet) {
+  const lastCol = Math.max(sheet.getLastColumn(), 1);
+  const headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0]
+    .map(function(h) { return String(h).trim(); });
+
+  let program = headers.indexOf('البرنامج') + 1;
+  let extra = headers.indexOf('بيانات إضافية') + 1;
+  let next = headers.length;
+
+  function addHeader(title) {
+    next++;
+    sheet.getRange(1, next).setValue(title);
+    try {
+      sheet.getRange(1, 1).copyTo(
+        sheet.getRange(1, next),
+        SpreadsheetApp.CopyPasteType.PASTE_FORMAT,
+        false
+      );
+    } catch (e) {}
+    return next;
+  }
+
+  if (!program) program = addHeader('البرنامج');
+  if (!extra) extra = addHeader('بيانات إضافية');
+
+  return { program: program, extra: extra };
+}
+
+function getOrCreateTemplatesSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(REPORT_TEMPLATES_SHEET_);
+  if (!sheet) {
+    sheet = ss.insertSheet(REPORT_TEMPLATES_SHEET_);
+    sheet.getRange(1, 1, 1, 8).setValues([[
+      'البرنامج', 'المفتاح', 'العنوان', 'النوع',
+      'الخيارات', 'مطلوب', 'الترتيب', 'نص إرشادي'
+    ]]);
+    sheet.getRange(1, 1, 1, 8).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+    try { sheet.setRightToLeft(true); } catch (e) {}
+  }
+  return sheet;
+}
+
+// حفظ قالب برنامج واحد (يستبدل حقوله بالكامل) - للأدمن فقط
+function saveReportTemplate_(program, fields) {
+  program = String(program || '').trim();
+
+  if (program !== REPORT_DEFAULT_PROGRAM_ && REPORT_PROGRAMS_.indexOf(program) === -1) {
+    throw new Error('البرنامج غير معروف');
+  }
+  if (!Array.isArray(fields) || fields.length === 0) {
+    throw new Error('يجب أن يحتوي التقرير على حقل واحد على الأقل');
+  }
+  if (fields.length > 25) {
+    throw new Error('الحد الأقصى 25 حقلًا للتقرير');
+  }
+
+  const used = {};
+  const clean = [];
+
+  fields.forEach(function(f, i) {
+    const label = String((f && f.label) || '').trim().slice(0, 80);
+    if (!label) {
+      throw new Error('يوجد حقل بدون عنوان (رقم ' + (i + 1) + ')');
+    }
+
+    const type = REPORT_FIELD_TYPES_.indexOf(f.type) !== -1 ? f.type : 'text';
+
+    let options = [];
+    if (type === 'select') {
+      options = (Array.isArray(f.options) ? f.options : [])
+        .map(function(s) { return String(s).replace(/\|/g, '/').trim(); })
+        .filter(Boolean);
+      if (options.length === 0) {
+        throw new Error('الحقل "' + label + '" قائمة منسدلة بدون خيارات');
+      }
+    }
+
+    let key = String(f.key || '').trim();
+    if (!/^[A-Za-z][A-Za-z0-9_]{0,40}$/.test(key) || used[key]) {
+      key = 'f_' + Utilities.getUuid().replace(/-/g, '').slice(0, 8);
+    }
+    used[key] = true;
+
+    clean.push([
+      program,
+      key,
+      safeReportCell_(label),
+      type,
+      safeReportCell_(options.join('|')),
+      f.required ? 'نعم' : 'لا',
+      i + 1,
+      safeReportCell_(String(f.placeholder || '').trim().slice(0, 120))
+    ]);
+  });
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const sheet = getOrCreateTemplatesSheet_();
+    const last = sheet.getLastRow();
+
+    let keep = [];
+    if (last >= 2) {
+      keep = sheet.getRange(2, 1, last - 1, 8).getValues()
+        .filter(function(r) { return String(r[0]).trim() !== program; });
+      sheet.getRange(2, 1, last - 1, 8).clearContent();
+    }
+
+    const all = keep.concat(clean);
+    sheet.getRange(2, 1, all.length, 8).setValues(all);
+  } finally {
+    lock.releaseLock();
+  }
+
+  return { success: true, message: 'تم حفظ قالب التقرير بنجاح' };
+}
+
+// الرجوع للقالب الافتراضي لبرنامج - للأدمن فقط
+function resetReportTemplate_(program) {
+  program = String(program || '').trim();
+
+  const sheet = SpreadsheetApp.getActiveSpreadsheet()
+    .getSheetByName(REPORT_TEMPLATES_SHEET_);
+
+  if (sheet && sheet.getLastRow() >= 2) {
+    const lock = LockService.getScriptLock();
+    lock.waitLock(20000);
+    try {
+      const last = sheet.getLastRow();
+      const rows = sheet.getRange(2, 1, last - 1, 8).getValues();
+      const keep = rows.filter(function(r) { return String(r[0]).trim() !== program; });
+      sheet.getRange(2, 1, last - 1, 8).clearContent();
+      if (keep.length) {
+        sheet.getRange(2, 1, keep.length, 8).setValues(keep);
+      }
+    } finally {
+      lock.releaseLock();
+    }
+  }
+
+  return { success: true, message: 'تمت إعادة القالب الافتراضي' };
+}
+
+/* =========================================================
+   نظام المحادثات النصية (الباك إند)
+   ---------------------------------------------------------
+   الصق هذا الملف كاملًا في آخر Code.gs
+
+   - الأدمن: يراسل كل الطلاب والمدرسين
+   - المدرس: يراسل طلابه فقط + الإدارة
+   - الطالب: يراسل مدرسه فقط + الإدارة
+   - الرسائل تُخزَّن في ورقة "الرسائل" (تُنشأ تلقائيًا)
+   - تُحذف الرسائل الأقدم من 7 أيام تلقائيًا
+   - خفيف: الواجهة تسأل كل 20 ثانية سؤالًا واحدًا رخيصًا
+     (رقم نسخة في الكاش) ولا تقرأ الشيت إلا لو حصل جديد
+========================================================= */
+
+const CHAT_SHEET_ = 'الرسائل';
+const CHAT_KEEP_MS_ = 7 * 24 * 60 * 60 * 1000;   // مدة الاحتفاظ بالرسائل: 7 أيام
+const CHAT_MAX_LEN_ = 1000;                       // أقصى طول للرسالة
+const CHAT_MAX_SHOWN_ = 200;                      // آخر كم رسالة تظهر في المحادثة
+
+/* ---------- الأعمدة في ورقة الرسائل ----------
+   0 رقم الرسالة | 1 المحادثة | 2 من | 3 إلى | 4 النص
+   5 الوقت (ms)  | 6 مقروءة   | 7 اسم المرسل
+------------------------------------------------ */
+
+function getChatSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(CHAT_SHEET_);
+  if (!sh) {
+    sh = ss.insertSheet(CHAT_SHEET_);
+    sh.getRange(1, 1, 1, 8).setValues([[
+      'رقم الرسالة', 'المحادثة', 'من', 'إلى',
+      'النص', 'الوقت', 'مقروءة', 'اسم المرسل'
+    ]]).setFontWeight('bold');
+    sh.getRange('E:E').setNumberFormat('@');   // نص عادي (يمنع تحويل النص لمعادلة)
+    sh.getRange('F:F').setNumberFormat('0');
+    sh.setFrozenRows(1);
+    try { sh.setRightToLeft(true); } catch (e) {}
+  }
+  return sh;
+}
+
+function chatReadAll_() {
+  const sh = getChatSheet_();
+  const last = sh.getLastRow();
+  if (last < 2) return [];
+  return sh.getRange(2, 1, last - 1, 8).getValues();
+}
+
+/* ---------- نسخة الشات (للتحديث السريع بدون قراءة الشيت) ---------- */
+
+function chatGetVer_() {
+  const cache = CacheService.getScriptCache();
+  let v = cache.get('chat:ver');
+  if (!v) {
+    v = String(Date.now());
+    cache.put('chat:ver', v, 21600);
+  }
+  return v;
+}
+
+function chatBumpVer_() {
+  CacheService.getScriptCache().put('chat:ver', String(Date.now()), 21600);
+}
+
+/* ---------- هوية المستخدم ---------- */
+
+// admin = صندوق مشترك لكل الأدمنز
+function chatMyKey_(user) {
+  if (user.role === 'admin') return 'admin';
+  const id = String(user.linkedId || '').trim();
+  if (user.role === 'teacher') return 'T:' + id;
+  return 'S:' + id;
+}
+
+function getStudentNameById_(studentId) {
+  const target = String(studentId || '').trim();
+  if (!target) return '';
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('الطلاب');
+  if (!sheet) return '';
+  const last = sheet.getLastRow();
+  if (last < 2) return '';
+  const rows = sheet.getRange(2, 1, last - 1, 2).getValues();
+  for (let i = 0; i < rows.length; i++) {
+    if (String(rows[i][0]).trim() === target) return String(rows[i][1] || '');
+  }
+  return '';
+}
+
+function chatMyName_(user) {
+  if (user.role === 'admin') return 'الإدارة';
+  if (user.role === 'teacher') return getTeacherNameById_(user.linkedId) || 'مدرس';
+  return getStudentNameById_(user.linkedId) || 'طالب';
+}
+
+/* ---------- من يحق له مراسلة من ---------- */
+
+function chatContacts_(user) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const out = [];
+  const adminContact = { key: 'admin', name: 'الإدارة', role: 'admin' };
+
+  const teachersSheet = ss.getSheetByName('المدرسون');
+  const studentsSheet = ss.getSheetByName('الطلاب');
+
+  function readTeachers() {
+    if (!teachersSheet || teachersSheet.getLastRow() < 2) return [];
+    return teachersSheet.getRange(2, 1, teachersSheet.getLastRow() - 1, 2).getValues();
+  }
+  function readStudents() {
+    if (!studentsSheet || studentsSheet.getLastRow() < 2) return [];
+    return studentsSheet.getRange(2, 1, studentsSheet.getLastRow() - 1, 7).getValues();
+  }
+
+  if (user.role === 'admin') {
+
+    readTeachers().forEach(function(r) {
+      const id = String(r[0] || '').trim();
+      if (id) out.push({ key: 'T:' + id, name: String(r[1] || ''), role: 'teacher' });
+    });
+    readStudents().forEach(function(r) {
+      const id = String(r[0] || '').trim();
+      if (id) out.push({ key: 'S:' + id, name: String(r[1] || ''), role: 'student' });
+    });
+
+  } else if (user.role === 'teacher') {
+
+    const myName = normName_(getTeacherNameById_(user.linkedId));
+    if (myName !== '') {
+      readStudents().forEach(function(r) {
+        const id = String(r[0] || '').trim();
+        if (id && normName_(r[6]) === myName) {
+          out.push({ key: 'S:' + id, name: String(r[1] || ''), role: 'student' });
+        }
+      });
+    }
+    out.push(adminContact);
+
+  } else {
+
+    const teacherName = normName_(getStudentTeacherName_(user.linkedId));
+    if (teacherName !== '') {
+      readTeachers().forEach(function(r) {
+        const id = String(r[0] || '').trim();
+        if (id && normName_(r[1]) === teacherName) {
+          out.push({ key: 'T:' + id, name: String(r[1] || ''), role: 'teacher' });
+        }
+      });
+    }
+    out.push(adminContact);
+  }
+
+  return out;
+}
+
+function chatAssertAllowed_(user, otherKey) {
+  const ok = chatContacts_(user).some(function(c) { return c.key === otherKey; });
+  if (!ok) throw new Error('لا يمكنك مراسلة هذا المستخدم');
+}
+
+function chatConvKey_(a, b) {
+  return [a, b].sort().join('|');
+}
+
+/* ---------- حذف الرسائل الأقدم من 7 أيام ---------- */
+
+function purgeOldChatMessages() {
+  const sh = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(CHAT_SHEET_);
+  if (!sh || sh.getLastRow() < 2) return 0;
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    const last = sh.getLastRow();
+    const rows = sh.getRange(2, 1, last - 1, 8).getValues();
+    const cutoff = Date.now() - CHAT_KEEP_MS_;
+    const keep = rows.filter(function(r) { return Number(r[5]) >= cutoff; });
+
+    if (keep.length === rows.length) return 0;
+
+    sh.getRange(2, 1, last - 1, 8).clearContent();
+    if (keep.length) sh.getRange(2, 1, keep.length, 8).setValues(keep);
+
+    chatBumpVer_();
+    return rows.length - keep.length;
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+// تنظيف تلقائي كسول: مرة كل 6 ساعات عند فتح صفحة الشات (بدون Trigger)
+function chatMaybePurge_() {
+  const cache = CacheService.getScriptCache();
+  if (cache.get('chat:purged')) return;
+  cache.put('chat:purged', '1', 21600);
+  try { purgeOldChatMessages(); } catch (e) {}
+}
+
+// اختياري: شغّل هذه الدالة مرة واحدة يدويًا من المحرر لعمل تنظيف يومي مضمون
+function setupChatPurgeTrigger() {
+  const exists = ScriptApp.getProjectTriggers().some(function(t) {
+    return t.getHandlerFunction() === 'purgeOldChatMessages';
+  });
+  if (!exists) {
+    ScriptApp.newTrigger('purgeOldChatMessages')
+      .timeBased().everyDays(1).atHour(3).create();
+  }
+}
+
+/* =========================================================
+   الدوال العامة (تستدعيها الواجهة)
+========================================================= */
+
+// سؤال رخيص كل 20 ثانية: هل حصل جديد؟
+function chatPoll(token, clientVer) {
+  const user = requireAuth_(token, ['admin', 'teacher', 'student']);
+  const ver = chatGetVer_();
+
+  if (String(clientVer || '') === ver) {
+    return { changed: false, ver: ver };
+  }
+
+  const myKey = chatMyKey_(user);
+  const rows = chatReadAll_();
+
+  let unread = 0;
+  let latest = null;
+
+  rows.forEach(function(r) {
+    if (String(r[3]) === myKey && String(r[6]) !== 'نعم') {
+      unread++;
+      const ts = Number(r[5]);
+      if (!latest || ts > latest.ts) {
+        latest = {
+          from: String(r[2]),
+          fromName: String(r[7] || ''),
+          text: String(r[4] || '').slice(0, 70),
+          ts: ts
+        };
+      }
+    }
+  });
+
+  return { changed: true, ver: ver, unread: unread, latest: latest };
+}
+
+// جهات الاتصال + آخر رسالة + غير المقروء
+function getChatContacts(token) {
+  const user = requireAuth_(token, ['admin', 'teacher', 'student']);
+  chatMaybePurge_();
+
+  const myKey = chatMyKey_(user);
+  const contacts = chatContacts_(user);
+  const rows = chatReadAll_();
+
+  const info = {};
+  let totalUnread = 0;
+
+  rows.forEach(function(r) {
+    const from = String(r[2]);
+    const to = String(r[3]);
+    let other = null;
+
+    if (from === myKey) other = to;
+    else if (to === myKey) other = from;
+    if (!other) return;
+
+    const i = info[other] || (info[other] = { unread: 0, lastTs: 0, lastText: '', lastMine: false });
+
+    if (to === myKey && String(r[6]) !== 'نعم') {
+      i.unread++;
+      totalUnread++;
+    }
+
+    const ts = Number(r[5]);
+    if (ts >= i.lastTs) {
+      i.lastTs = ts;
+      i.lastText = String(r[4] || '').slice(0, 80);
+      i.lastMine = (from === myKey);
+    }
+  });
+
+  contacts.forEach(function(c) {
+    const i = info[c.key];
+    c.unread = i ? i.unread : 0;
+    c.lastTs = i ? i.lastTs : 0;
+    c.lastText = i ? i.lastText : '';
+    c.lastMine = i ? i.lastMine : false;
+  });
+
+  return {
+    me: myKey,
+    myName: chatMyName_(user),
+    role: user.role,
+    ver: chatGetVer_(),
+    unread: totalUnread,
+    contacts: contacts
+  };
+}
+
+// رسائل محادثة واحدة (ويعلّم الواردة كمقروءة)
+function getChatMessages(token, otherKey) {
+  const user = requireAuth_(token, ['admin', 'teacher', 'student']);
+  otherKey = String(otherKey || '').trim();
+  chatAssertAllowed_(user, otherKey);
+
+  const myKey = chatMyKey_(user);
+  const conv = chatConvKey_(myKey, otherKey);
+
+  const sh = getChatSheet_();
+  const last = sh.getLastRow();
+  if (last < 2) return { messages: [] };
+
+  const rows = sh.getRange(2, 1, last - 1, 8).getValues();
+  const readCol = rows.map(function(r) { return [r[6]]; });
+
+  const msgs = [];
+  let marked = 0;
+
+  rows.forEach(function(r, i) {
+    if (String(r[1]) !== conv) return;
+
+    msgs.push({
+      id: String(r[0]),
+      mine: String(r[2]) === myKey,
+      text: String(r[4] || ''),
+      ts: Number(r[5]),
+      read: String(r[6]) === 'نعم'
+    });
+
+    if (String(r[3]) === myKey && String(r[6]) !== 'نعم') {
+      readCol[i][0] = 'نعم';
+      marked++;
+    }
+  });
+
+  if (marked > 0) {
+    sh.getRange(2, 7, rows.length, 1).setValues(readCol);
+    chatBumpVer_();
+  }
+
+  msgs.sort(function(a, b) { return a.ts - b.ts; });
+
+  return { messages: msgs.slice(-CHAT_MAX_SHOWN_) };
+}
+
+// إرسال رسالة
+function sendChatMessage(token, toKey, text) {
+  const user = requireAuth_(token, ['admin', 'teacher', 'student']);
+  toKey = String(toKey || '').trim();
+  chatAssertAllowed_(user, toKey);
+
+  text = String(text || '').replace(/\r\n/g, '\n').trim();
+  if (!text) throw new Error('اكتب رسالة أولًا');
+  if (text.length > CHAT_MAX_LEN_) text = text.slice(0, CHAT_MAX_LEN_);
+
+  const myKey = chatMyKey_(user);
+  const myName = chatMyName_(user);
+  const now = Date.now();
+  const id = 'M' + now + Math.floor(Math.random() * 1000);
+
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  try {
+    getChatSheet_().appendRow([
+      id,
+      chatConvKey_(myKey, toKey),
+      myKey,
+      toKey,
+      text,
+      now,
+      '',
+      myName
+    ]);
+    chatBumpVer_();
+  } finally {
+    lock.releaseLock();
+  }
+
+  return { success: true, id: id, ts: now };
 }
